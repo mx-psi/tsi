@@ -1,5 +1,4 @@
 ---
----
 title: Práctica 2
 subtitle: Técnicas de los Sistemas Inteligentes - Grupo Lunes
 author: Pablo Baeyens Fernández
@@ -14,7 +13,6 @@ header-includes:
 - \newcommand{\w}{\mathbf{w}}
 - \usepackage{etoolbox}
 - \AtBeginEnvironment{quote}{\itshape}
----
 ---
 
 # Ejercicio 1
