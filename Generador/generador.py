@@ -4,6 +4,9 @@
 
 import argparse
 import collections
+import re
+
+## CONSTANTES
 
 TEMPLATE = """(define
   (problem {nombre})
@@ -29,48 +32,50 @@ DEFAULT_INIT = """   (next N E)
 ORIENTACION = {"V": "N", "H": "O"}
 
 
+def parse_zona(zona):
+  start_obj, end_obj = zona.find("["), zona.find("]")
+  nombre_zona = zona[:start_obj]
+  objetos = zona[start_obj + 1:end_obj].strip().split()
+  return nombre_zona, objetos
+
+
 def parsea(entrada):
   """Genera lista de zonas y sus conexiones dado fichero de entrada"""
   entrada.readline()  # ignora primera línea
 
-  zonas = collections.defaultdict(list)
+  zonas = collections.defaultdict(set)
   conexiones = []
   entidades = dict()
+
+  zonas_matcher = re.compile("[\w\d]*?\[[\w\d\-]*?\]\[[\w\d\-]*?\]")
+  distancias_matcher = re.compile("=(\d*?)=")
 
   for linea in entrada:
     # Divide en dirección y contenido
     direccion, contenido = linea.strip('\n').split("->")
     orientacion = ORIENTACION[direccion.strip()]
-    datos_zonas = contenido.strip().split()
-    # Zona previa
-    prev = None
+    distancias = [int(d) for d in distancias_matcher.findall(contenido)]
+    datos_zonas = [parse_zona(zona) for zona in zonas_matcher.findall(contenido)]
 
-    # Para cada zona
-    for zona in datos_zonas:
-      start_obj, end_obj = zona.find("["), zona.find("]")
-      nombre_zona = zona[:start_obj]
+    for nombre_zona, objetos in datos_zonas:
+      entidades[nombre_zona] = "Zona"
 
-      # Añade conexiones
-      if prev is not None:
-        conexiones.append((prev, nombre_zona, orientacion))
-      prev = nombre_zona
-
-      # Añade zona como entidad
-      if nombre_zona not in entidades:
-        entidades[nombre_zona] = "Zona"
-
-      # Añade objetos como entidades
-      objetos = zona[start_obj + 1:end_obj].strip().split()
       for objeto in objetos:
         nombre, tipo = objeto.split("-")
         entidades[nombre] = tipo
-        zonas[nombre_zona].append(nombre)
+        zonas[nombre_zona].add(nombre)
+
+    for i in range(len(datos_zonas) - 1):
+      conexiones.append(
+        (datos_zonas[i][0], datos_zonas[i + 1][0], orientacion, distancias[i]))
 
   return zonas, conexiones, entidades
 
 
-def genera_pddl(entrada, problema="problema", dominio="dominio"):
+def genera_pddl(entrada):
   """Genera fichero PDDL dadas zonas, conexiones y entidades"""
+  dominio = entrada.readline().split(":")[1].strip()
+  problema = entrada.readline().split(":")[1].strip()
   zonas, conexiones, entidades = parsea(entrada)
 
   objects = ""
@@ -79,10 +84,10 @@ def genera_pddl(entrada, problema="problema", dominio="dominio"):
   for nombre, tipo in entidades.items():
     objects += "   {nombre} - {tipo}\n".format(nombre=nombre, tipo=tipo)
 
-  for z1, z2, o in conexiones:
+  for z1, z2, o, _ in conexiones:
     init += "   (connected-to {} {} {})\n".format(z1, z2, o)
 
-  for zona, localizables in zonas:
+  for zona, localizables in zonas.items():
     for localizable in localizables:
       init += "   (is-at {} {})\n".format(localizable, zona)
 
