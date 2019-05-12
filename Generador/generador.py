@@ -3,7 +3,6 @@
 # Usage: ./generador.py [in] [out]
 
 import argparse
-import collections
 import re
 
 ## CONSTANTES
@@ -24,15 +23,33 @@ GOAL = "   (is-at player1 z1)"
 
 ## FIXME: ¿Añadir orientación inicial del jugador?
 ## FIXME: ¿Añadir que el jugador tiene la mano vacía?
-DEFAULT_INIT = """   (next N E)
+DEFAULT_INIT = """
+   (next N E)
    (next E S)
    (next S W)
    (next W N)
+   (opposite N S)
+   (opposite S N)
+   (opposite E W)
+   (opposite W E)
 """
-ORIENTACION = {"V": "N", "H": "O"}
+ORIENTACION = {"V": "N", "H": "W"}
 
 
-def parse_zona(zona):
+class ParseError(Exception):
+  def __init__(self, lineno, message):
+    self.lineno = lineno
+    self.message = message
+
+
+def lee_linea(linea, lineno):
+  try:
+    return linea.split(":")[1].strip()
+  except ValueError:
+    raise ParseError(lineno, "No pude leer dato de '{}'".format(linea.strip()))
+
+
+def parse_zona(zona, lineno):
   start_obj, end_obj = zona.find("["), zona.find("]")
   nombre_zona = zona[:start_obj]
   objetos = zona[start_obj + 1:end_obj].strip().split()
@@ -41,24 +58,40 @@ def parse_zona(zona):
 
 def parsea(entrada):
   """Genera lista de zonas y sus conexiones dado fichero de entrada"""
-  entrada.readline()  # ignora primera línea
+  lineno = 3
+  n_zonas = int(lee_linea(entrada.readline(), lineno))
 
-  zonas = collections.defaultdict(set)
+  zonas = {}
   conexiones = []
-  entidades = dict()
+  entidades = {}
 
   zonas_matcher = re.compile("[\w\d]*?\[[\w\d\-]*?\]\[[\w\d\-]*?\]")
   distancias_matcher = re.compile("=(\d*?)=")
 
   for linea in entrada:
+    lineno += 1
+
+    if linea.strip() == "":
+      continue
+
     # Divide en dirección y contenido
-    direccion, contenido = linea.strip('\n').split("->")
+    try:
+      direccion, contenido = linea.strip().split("->")
+    except ValueError as v:
+      raise ParseError(lineno,
+                       "dirección incorrecta en '{}'".format(linea.strip()))
+
     orientacion = ORIENTACION[direccion.strip()]
     distancias = [int(d) for d in distancias_matcher.findall(contenido)]
-    datos_zonas = [parse_zona(zona) for zona in zonas_matcher.findall(contenido)]
+    datos_zonas = [
+      parse_zona(zona, lineno) for zona in zonas_matcher.findall(contenido)
+    ]
 
     for nombre_zona, objetos in datos_zonas:
       entidades[nombre_zona] = "Zona"
+
+      if nombre_zona not in zonas:
+        zonas[nombre_zona] = set()
 
       for objeto in objetos:
         nombre, tipo = objeto.split("-")
@@ -69,13 +102,19 @@ def parsea(entrada):
       conexiones.append(
         (datos_zonas[i][0], datos_zonas[i + 1][0], orientacion, distancias[i]))
 
+  zonas_obtenidas = len(zonas.keys())
+  if n_zonas != zonas_obtenidas:
+    raise ParseError(
+      lineno, "se esperaban {} zonas pero se obtuvieron {}.".format(
+        n_zonas, zonas_obtenidas))
+
   return zonas, conexiones, entidades
 
 
 def genera_pddl(entrada):
   """Genera fichero PDDL dadas zonas, conexiones y entidades"""
-  dominio = entrada.readline().split(":")[1].strip()
-  problema = entrada.readline().split(":")[1].strip()
+  dominio = lee_linea(entrada.readline(), 1)
+  problema = lee_linea(entrada.readline(), 2)
   zonas, conexiones, entidades = parsea(entrada)
 
   objects = ""
@@ -106,5 +145,8 @@ if __name__ == "__main__":
 
   args = parser.parse_args()
   with open(args.entrada, 'r') as entrada, open(args.salida, 'w') as salida:
-    pddl = genera_pddl(entrada)
-    salida.write(pddl)
+    try:
+      pddl = genera_pddl(entrada)
+      salida.write(pddl)
+    except ParseError as p:
+      print("Error en linea {}: {}".format(p.lineno, p.message))
