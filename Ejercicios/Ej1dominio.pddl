@@ -1,4 +1,4 @@
-(define (domain EJ1)
+(define (domain Ejercicio1)
   (:requirements :strips :typing :adl)
 
   (:types
@@ -7,10 +7,10 @@
     Player Princesa Principe Bruja Profesor Leonardo - Personaje ;; Personajes
     Oscar Manzana Rosa Algoritmo Oro - Objeto) ;; Pueden ser recogidos
 
-  (:predicates
-    ;; TODO: ¿Se necesita especificar que algo es un jugador?
+  (:constants N S E W - Orientacion)
 
-    ;; z2 está al o de z1
+  (:predicates
+    ;; z1 está al o de z2
     (connected-to ?z1 - Zona ?z2 - Zona ?o - Orientacion)
 
     ;; c está en z
@@ -21,6 +21,7 @@
 
     ;; En el sentido de las agujas del reloj, o1 va antes que o2
     (next ?o1 - Orientacion ?o2 - Orientacion)
+    (opposite ?o1 ?o2 - Orientacion)
 
     ;; p tiene en la mano o
     (holding ?c - Personaje ?o - Objeto)
@@ -30,7 +31,6 @@
     )
 
   ;; gira a la izquierda
-  ;; TODO: unificar en una acción girar que tome un parámetro dirección?
   (:action turn-right
     :parameters (?x - Personaje ?o1 - Orientacion ?o2 - Orientacion)
     :precondition
@@ -62,12 +62,12 @@
 
   ;; Mueve a un jugador
   (:action move
-    :parameters (?x - Player ?orig - Zona ?dest - Zona ?o - Orientacion)
+    :parameters (?x - Player ?orig - Zona ?dest - Zona ?o ?o2 - Orientacion)
     :precondition
     (and
       (is-at ?x ?orig)
       (oriented ?x ?o)
-      (connected-to ?orig ?dest ?o)
+      (or (connected-to ?orig ?dest ?o) (and (connected-to ?dest ?orig ?o2) (opposite ?o ?o2)))
       )
     :effect
     (and
