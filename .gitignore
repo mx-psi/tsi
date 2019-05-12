@@ -2,4 +2,5 @@ Metric-FF/*
 *.txt
 *.pdf
 *.zip
+*.yapf
 EjemplosSesion7/*
