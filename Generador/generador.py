@@ -35,87 +35,93 @@ DEFAULT_INIT = """
 """
 ORIENTACION = {"V": "N", "H": "W"}
 
+ZONAS_RE = re.compile("([\w\d]*?)\[([\w\d\-]*?)\](?:\[([\w\d\-]*?)\])?")
+DISTS_RE = re.compile("=(\d*?)=")
+
 
 class ParseError(Exception):
+  """Excepción en el parsing."""
+
   def __init__(self, lineno, message):
     self.lineno = lineno
     self.message = message
 
 
-def lee_linea(linea, lineno):
-  try:
-    return linea.split(":")[1].strip()
-  except ValueError:
-    raise ParseError(lineno, "No pude leer dato de '{}'".format(linea.strip()))
-
-
-def parse_zona(zona, lineno):
-  start_obj, end_obj = zona.find("["), zona.find("]")
-  nombre_zona = zona[:start_obj]
-  objetos = zona[start_obj + 1:end_obj].strip().split()
-  return nombre_zona, objetos
-
-
-def parsea(entrada):
+def parsea(entrada, num_zonas, start):
   """Genera lista de zonas y sus conexiones dado fichero de entrada"""
-  lineno = 3
-  n_zonas = int(lee_linea(entrada.readline(), lineno))
 
-  zonas = {}
-  conexiones = []
-  entidades = {}
+  zonas, entidades = {}, {}
+  conexiones, distancias = [], []
 
-  zonas_matcher = re.compile("[\w\d]*?\[[\w\d\-]*?\]\[[\w\d\-]*?\]")
-  distancias_matcher = re.compile("=(\d*?)=")
+  for lineno, linea in enumerate(entrada, start=start):
 
-  for linea in entrada:
-    lineno += 1
+    if linea.strip() == "": continue
 
-    if linea.strip() == "":
-      continue
-
-    # Divide en dirección y contenido
     try:
       direccion, contenido = linea.strip().split("->")
     except ValueError as v:
       raise ParseError(lineno,
-                       "dirección incorrecta en '{}'".format(linea.strip()))
+                       "dirección incorrecta '{}'".format(linea.strip()))
 
     orientacion = ORIENTACION[direccion.strip()]
-    distancias = [int(d) for d in distancias_matcher.findall(contenido)]
-    datos_zonas = [
-      parse_zona(zona, lineno) for zona in zonas_matcher.findall(contenido)
-    ]
+    datos_zonas = ZONAS_RE.findall(contenido)
+    zona_previa = None
 
-    for nombre_zona, objetos in datos_zonas:
-      entidades[nombre_zona] = "Zona"
+    for nombre_zona, objetos, tipo in datos_zonas:
+      entidades[nombre_zona] = tipo if tipo != '' else "Zona"
 
-      if nombre_zona not in zonas:
-        zonas[nombre_zona] = set()
+      if nombre_zona not in zonas: zonas[nombre_zona] = set()
 
-      for objeto in objetos:
+      for objeto in objetos.split():
         nombre, tipo = objeto.split("-")
         entidades[nombre] = tipo
         zonas[nombre_zona].add(nombre)
 
-    for i in range(len(datos_zonas) - 1):
-      conexiones.append(
-        (datos_zonas[i][0], datos_zonas[i + 1][0], orientacion, distancias[i]))
+      if zona_previa is not None:
+        conexiones.append((zona_previa, nombre_zona, orientacion))
+      zona_previa = nombre_zona
+
+    for i, d in enumerate(DISTS_RE.findall(contenido)):
+      distancias.append((datos_zonas[i][0], datos_zonas[i + 1][0], d))
 
   zonas_obtenidas = len(zonas.keys())
-  if n_zonas != zonas_obtenidas:
+  if int(num_zonas) != zonas_obtenidas:
     raise ParseError(
-      lineno, "se esperaban {} zonas pero se obtuvieron {}.".format(
-        n_zonas, zonas_obtenidas))
+      lineno,
+      "{} zonas esperadas pero {} obtenidas.".format(num_zonas,
+                                                     zonas_obtenidas))
 
-  return zonas, conexiones, entidades
+  return zonas, conexiones, entidades, distancias
+
+
+def lee_datos(entrada):
+  """Lee datos de entrada de la forma "clave:valor"."""
+
+  datos = {}
+  lineno = 0
+
+  while True:
+    pos = entrada.tell()
+    linea = entrada.readline()
+    lineno += 1
+    if ":" in linea:
+      clave, valor = linea.split(":")
+
+      if clave.strip().lower() in datos:
+        raise ParseError(lineno, "Variable '{}' duplicada".format(clave))
+
+      datos[clave.strip().lower()] = valor.strip()
+    else:
+      entrada.seek(pos)
+      return datos, lineno
 
 
 def genera_pddl(entrada):
   """Genera fichero PDDL dadas zonas, conexiones y entidades"""
-  dominio = lee_linea(entrada.readline(), 1)
-  problema = lee_linea(entrada.readline(), 2)
-  zonas, conexiones, entidades = parsea(entrada)
+  datos, lineno = lee_datos(entrada)
+  zonas, conexiones, entidades, distancias = parsea(entrada,
+                                                    datos["numero de zonas"],
+                                                    lineno)
 
   objects = ""
   init = DEFAULT_INIT
@@ -123,15 +129,18 @@ def genera_pddl(entrada):
   for nombre, tipo in entidades.items():
     objects += "   {nombre} - {tipo}\n".format(nombre=nombre, tipo=tipo)
 
-  for z1, z2, o, _ in conexiones:
+  for z1, z2, o in conexiones:
     init += "   (connected-to {} {} {})\n".format(z1, z2, o)
+
+  for z1, z2, d in distancias:
+    init += "   (= (distance {} {}) {})\n".format(z1, z2, d)
 
   for zona, localizables in zonas.items():
     for localizable in localizables:
       init += "   (is-at {} {})\n".format(localizable, zona)
 
-  return TEMPLATE.format(nombre=problema,
-                         dominio=dominio,
+  return TEMPLATE.format(nombre=datos["problema"],
+                         dominio=datos["dominio"],
                          objects=objects,
                          init=init,
                          goal=GOAL)
