@@ -4,7 +4,8 @@
   (:types
     Orientacion Zona Localizable - object
     Personaje Objeto - Localizable ;; Tienen localización
-    Player Princesa Principe Bruja Profesor Leonardo - Personaje ;; Personajes
+    Player NPC - Personaje ;; Personajes
+    Princesa Principe Bruja Profesor Leonardo - NPC
     Oscar Manzana Rosa Algoritmo Oro - Objeto) ;; Pueden ser recogidos
 
   (:constants N S E W - Orientacion)
@@ -111,7 +112,7 @@
 
   ;; Da un objeto a un personaje
   (:action give
-    :parameters (?p - Player ?o - Objeto ?c - Personaje ?z - Zona)
+    :parameters (?p - Player ?o - Objeto ?c - NPC ?z - Zona)
     :precondition
     (and
       (holding ?p ?o)
