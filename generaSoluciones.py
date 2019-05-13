@@ -11,7 +11,7 @@ import subprocess
 def generaSoluciones(dominio, i, problema, j):
   salida = "Ejercicios/Ej{i}soluciones/Plan_problema{j}.txt".format(i=i, j=j)
   process = subprocess.run(
-    "./Metric-FF/ff -O -o Ejercicios/{} -f Ejercicios/{} > {}".format(
+    "./Metric-FF/ff -O -o Ejercicios/{} -f Ejercicios/{} -g 1 -h 1 > {}".format(
       dominio, problema, salida),
     shell=True,
     universal_newlines=True,
