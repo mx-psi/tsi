@@ -19,11 +19,7 @@ TEMPLATE = """(define
 )
   """
 
-## FIXME: Arreglar
-GOAL = "   (is-at player1 z1)"
-
-## FIXME: ¿Añadir orientación inicial del jugador?
-## FIXME: ¿Añadir que el jugador tiene la mano vacía?
+## Inicialización por defecto
 DEFAULT_INIT = """
    (next N E)
    (next E S)
@@ -36,15 +32,45 @@ DEFAULT_INIT = """
 """
 
 # Orientación asignada a cada dirección
-ORIENTACION = {"V": "N", "H": "W"}
+ORIENTACION = {"V": ["N", "S"], "H": ["W", "E"]}
 
 ## Puntos obtenidos al entregar a cada personaje cada tipo de objeto
 PUNTOS = {
-  "Leonardo": {"Oscar": 10, "Rosa": 1, "Manzana": 3, "Algoritmo": 4, "Oro": 5},
-  "Princesa": {"Oscar": 5, "Rosa": 10, "Manzana": 1, "Algoritmo": 3, "Oro": 4},
-  "Bruja":    {"Oscar": 4, "Rosa": 5, "Manzana": 10, "Algoritmo": 1, "Oro": 3},
-  "Profesor": {"Oscar": 3, "Rosa": 4, "Manzana": 5, "Algoritmo": 10, "Oro": 1},
-  "Principe": {"Oscar": 1, "Rosa": 3, "Manzana": 4, "Algoritmo": 5, "Oro": 10},
+  "Leonardo": {
+    "Oscar": 10,
+    "Rosa": 1,
+    "Manzana": 3,
+    "Algoritmo": 4,
+    "Oro": 5
+  },
+  "Princesa": {
+    "Oscar": 5,
+    "Rosa": 10,
+    "Manzana": 1,
+    "Algoritmo": 3,
+    "Oro": 4
+  },
+  "Bruja": {
+    "Oscar": 4,
+    "Rosa": 5,
+    "Manzana": 10,
+    "Algoritmo": 1,
+    "Oro": 3
+  },
+  "Profesor": {
+    "Oscar": 3,
+    "Rosa": 4,
+    "Manzana": 5,
+    "Algoritmo": 10,
+    "Oro": 1
+  },
+  "Principe": {
+    "Oscar": 1,
+    "Rosa": 3,
+    "Manzana": 4,
+    "Algoritmo": 5,
+    "Oro": 10
+  },
 }
 
 ## Campos requeridos para cada ejercicio.
@@ -56,7 +82,6 @@ DATOS_REQ = {
   6: ["puntos_jugador"],
   7: ["numero de jugadores"],
 }
-
 
 ZONAS_RE = re.compile("([\w\d]*?)\[([\w\d\-]*?)\](?:\[([\w\d\-]*?)\])?")
 DISTS_RE = re.compile("=(\d*?)=")
@@ -90,10 +115,8 @@ def parsea(entrada, num_zonas, start):
     try:
       direccion, contenido = linea.strip().split("->")
     except ValueError as v:
-      raise ParseError(lineno,
-                       "dirección incorrecta '{}'".format(linea.strip()))
+      raise ParseError(lineno, "linea incorrecta '{}'".format(linea.strip()))
 
-    orientacion = ORIENTACION[direccion.strip()]
     datos_zonas = ZONAS_RE.findall(contenido)
     zona_previa = None
 
@@ -108,7 +131,7 @@ def parsea(entrada, num_zonas, start):
         zonas[nombre_zona].add(nombre)
 
       if zona_previa is not None:
-        conexiones.append((zona_previa, nombre_zona, orientacion))
+        conexiones.append((zona_previa, nombre_zona, direccion.strip()))
       zona_previa = nombre_zona
 
     for i, d in enumerate(DISTS_RE.findall(contenido)):
@@ -123,6 +146,7 @@ def parsea(entrada, num_zonas, start):
 
   return zonas, conexiones, entidades, distancias
 
+
 def parsea_lista(lista, lineno):
   """Parsea una lista"""
   valores = []
@@ -135,7 +159,6 @@ def parsea_lista(lista, lineno):
 
 def lee_datos(entrada):
   """Lee datos de entrada de la forma "clave:valor"."""
-
   datos = {}
   lineno = 0
 
@@ -143,6 +166,7 @@ def lee_datos(entrada):
     pos = entrada.tell()
     linea = entrada.readline()
     lineno += 1
+    if linea.strip() == "": continue
     if ":" in linea:
       clave, valor = linea.split(":")
 
@@ -154,17 +178,44 @@ def lee_datos(entrada):
       entrada.seek(pos)
       return datos, lineno
 
+
 def get_num_domain(datos, lineno):
   """Obten número del dominio"""
   if "dominio" not in datos:
-    raise ParseError(lineno, "Campo '{}' no definido.".format(dato)))
+    raise ParseError(lineno, "Campo '{}' no definido.".format(dato))
 
-  match = re.compile("^ejercicio(\d+)$").match(datos[dominio])
+  match = re.compile("^ejercicio(\d+)$").match(datos["dominio"])
   num_domain = int(match.group(1)) if match is not None else -1
 
-  if num_domain not in range(1,8):
-    raise ParseError(lineno, "'{}' no es un dominio válido.".format(datos[dominio]))
+  if num_domain not in range(1, 8):
+    raise ParseError(lineno,
+                     "'{}' no es un dominio válido.".format(datos[dominio]))
   return num_domain
+
+
+def get_goal(num_domain, datos, entidades):
+  """Obten objetivo"""
+  if num_domain <= 3:
+    goal = input("Introduzca el objetivo: ").lower().strip()
+    return "   {}\n".format(goal)
+  else:
+    raise NotImplementedError(
+      "Objetivo para ejercicio 4 y superior no implementado")
+
+
+def datos_personajes(num_domain, entidades):
+  """Genera datos de personajes"""
+
+  datos = ""
+  for nombre, tipo in entidades.items():
+    if tipo in {
+        "Princesa", "Principe", "Bruja", "Profesor", "Leonardo", "Player"
+    }:
+      datos += "   (emptyhand {})\n".format(nombre)
+    if tipo in {"Player"}:
+      datos += "   (oriented {} S)\n".format(nombre)
+
+  return datos
 
 
 def genera_pddl(entrada):
@@ -172,11 +223,12 @@ def genera_pddl(entrada):
   datos, lineno = lee_datos(entrada)
   num_domain = get_num_domain(datos, lineno)
 
-  for n, requeridos in DATOS_REQ:
+  for n, requeridos in DATOS_REQ.items():
     if num_domain >= n:
       for campo in requeridos:
         if campo not in datos:
-          raise ParseError(lineno, "Campo '{}' requerido no definido".format(campo))
+          raise ParseError(lineno,
+                           "Campo '{}' requerido no definido".format(campo))
 
   zonas, conexiones, entidades, distancias = parsea(entrada,
                                                     datos["numero de zonas"],
@@ -187,8 +239,9 @@ def genera_pddl(entrada):
   for nombre, tipo in entidades.items():
     objects += "   {nombre} - {tipo}\n".format(nombre=nombre, tipo=tipo)
 
-  for z1, z2, o in conexiones:
-    init += "   (connected-to {} {} {})\n".format(z1, z2, o)
+  for z1, z2, d in conexiones:
+    init += "   (connected-to {} {} {})\n".format(z1, z2, ORIENTACION[d][0])
+    init += "   (connected-to {} {} {})\n".format(z2, z1, ORIENTACION[d][1])
 
   for zona, localizables in zonas.items():
     for localizable in localizables:
@@ -196,13 +249,16 @@ def genera_pddl(entrada):
 
   for z1, z2, d in distancias:
     init += "   (= (distance {} {}) {})\n".format(z1, z2, d)
+    init += "   (= (distance {} {}) {})\n".format(z2, z1, d)
 
-  ##FIXME: Inicializar orientación y mano de cada jugador
+  init += datos_personajes(num_domain, entidades)
 
   if num_domain >= 4:
     init += "  (= (total-points) {})\n".format(datos["puntos_totales"])
     ## FIXME: Inicializar puntos de cada jugador a 0
+    raise NotImplementedError("Inicialización de puntos no implementada")
 
+    ## FIXME: De alguna forma hay que indicar personaje como tipo
     for personaje, objetos in PUNTOS:
       for objeto, puntos in objetos.items():
         init += "  (= (reward {} {}) {})\n".format(personaje, objeto, puntos)
@@ -211,7 +267,7 @@ def genera_pddl(entrada):
                          dominio=datos["dominio"],
                          objects=objects,
                          init=init,
-                         goal=GOAL)
+                         goal=get_goal(num_domain, datos, entidades))
 
 
 if __name__ == "__main__":
@@ -221,9 +277,12 @@ if __name__ == "__main__":
   parser.add_argument("salida", help="Fichero de salida en formato PDDL")
 
   args = parser.parse_args()
-  with open(args.entrada, 'r') as entrada, open(args.salida, 'w') as salida:
-    try:
+
+  try:
+    with open(args.entrada, 'r') as entrada, open(args.salida, 'w') as salida:
       pddl = genera_pddl(entrada)
       salida.write(pddl)
-    except ParseError as p:
-      print("Error en linea {}: {}".format(p.lineno, p.message))
+  except ParseError as p:
+    print("Error en linea {}: {}".format(p.lineno, p.message))
+  except FileNotFoundError as f:
+    print("Error: No se pudo abrir '{}'.".format(args.entrada))
