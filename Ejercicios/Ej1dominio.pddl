@@ -63,12 +63,12 @@
 
   ;; Mueve a un jugador
   (:action move
-    :parameters (?x - Player ?orig - Zona ?dest - Zona ?o ?o2 - Orientacion)
+    :parameters (?x - Player ?orig - Zona ?dest - Zona ?o - Orientacion)
     :precondition
     (and
       (is-at ?x ?orig)
       (oriented ?x ?o)
-      (or (connected-to ?orig ?dest ?o) (and (connected-to ?dest ?orig ?o2) (opposite ?o ?o2)))
+      (connected-to ?orig ?dest ?o)
       )
     :effect
     (and
