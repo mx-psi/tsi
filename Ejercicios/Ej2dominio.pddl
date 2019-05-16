@@ -1,4 +1,4 @@
-(define (domain Ejercicio1)
+(define (domain Ejercicio2)
   (:requirements :strips :typing :adl)
 
   (:types
@@ -79,7 +79,7 @@
     (and
       (not (is-at ?x ?orig))
       (is-at ?x ?dest)
-      (increase (total-distance ?p) (distance ?orig ?dest))
+      (increase (total-distance ?x) (distance ?orig ?dest))
       )
     )
 

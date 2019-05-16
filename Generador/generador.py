@@ -16,12 +16,12 @@ TEMPLATE = """(define
 {init})
   (:goal
 {goal})
+  {metric}
 )
   """
 
 ## Inicialización por defecto
-DEFAULT_INIT = """
-   (next N E)
+DEFAULT_INIT = """   (next N E)
    (next E S)
    (next S W)
    (next W N)
@@ -173,7 +173,11 @@ def lee_datos(entrada):
       if clave.strip().lower() in datos:
         raise ParseError(lineno, "Variable '{}' duplicada".format(clave))
 
-      datos[clave.strip().lower()] = valor.strip().lower()
+      if valor.startswith("["):
+        datos[clave.strip().lower()] = parsea_lista(valor.strip()[1:-1])
+      else:
+        datos[clave.strip().lower()] = valor.strip().lower()
+
     else:
       entrada.seek(pos)
       return datos, lineno
@@ -191,6 +195,13 @@ def get_num_domain(datos, lineno):
     raise ParseError(lineno,
                      "'{}' no es un dominio válido.".format(datos[dominio]))
   return num_domain
+
+
+def get_metric(num_domain):
+  if num_domain == 1:
+    return ""
+  else:
+    return "   (:metric minimize (total-distance))\n"
 
 
 def get_goal(num_domain, datos, entidades):
@@ -214,6 +225,8 @@ def datos_personajes(num_domain, entidades):
       datos += "   (emptyhand {})\n".format(nombre)
     if tipo in {"Player"}:
       datos += "   (oriented {} S)\n".format(nombre)
+      if num_domain >= 2:
+        datos += "   (= (total-distance {}) 0)\n".format(nombre)
 
   return datos
 
@@ -267,7 +280,8 @@ def genera_pddl(entrada):
                          dominio=datos["dominio"],
                          objects=objects,
                          init=init,
-                         goal=get_goal(num_domain, datos, entidades))
+                         goal=get_goal(num_domain, datos, entidades),
+                         metric=get_metric(num_domain))
 
 
 if __name__ == "__main__":
