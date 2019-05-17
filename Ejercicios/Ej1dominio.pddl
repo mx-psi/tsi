@@ -11,7 +11,7 @@
   (:constants N S E W - Orientacion)
 
   (:predicates
-    ;; z1 está al o de z2
+    ;; z2 está al o de z1
     (connected-to ?z1 - Zona ?z2 - Zona ?o - Orientacion)
 
     ;; c está en z
@@ -22,13 +22,15 @@
 
     ;; En el sentido de las agujas del reloj, o1 va antes que o2
     (next ?o1 - Orientacion ?o2 - Orientacion)
+
+    ;; o1 es la orientación opuesta a o2
     (opposite ?o1 ?o2 - Orientacion)
 
     ;; p tiene en la mano o
     (holding ?c - Personaje ?o - Objeto)
 
     ;; La mano de c está vacía
-    (emptyhand ?c - Personaje)
+    (emptyhand ?p - Player)
     )
 
   ;; gira a la izquierda
@@ -118,12 +120,10 @@
       (holding ?p ?o)
       (is-at ?p ?z)
       (is-at ?c ?z)
-      (emptyhand ?c)
       )
     :effect
     (and
       (not (holding ?p ?o))
-      (not (emptyhand ?c))
       (holding ?c ?o)
       (emptyhand ?p)
       )

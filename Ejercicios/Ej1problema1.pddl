@@ -108,13 +108,8 @@
    (is-at princesa1 z10)
    (is-at leonardo1 z13)
    (is-at manzana1 z2)
-   (emptyhand leonardo1)
    (emptyhand player1)
    (oriented player1 S)
-   (emptyhand bruja1)
-   (emptyhand princesa1)
-   (emptyhand principe1)
-   (emptyhand profesor1)
 )
   (:goal
    (and (holding leonardo1 oscar1) (holding bruja1 manzana1) (holding princesa1 rosa1) (holding principe1 oro1) (holding profesor1 algoritmo1))

@@ -28,7 +28,7 @@
     (holding ?c - Personaje ?o - Objeto)
 
     ;; La mano de c está vacía
-    (emptyhand ?c - Personaje)
+    (emptyhand ?p - Player)
     )
 
   (:functions
@@ -73,7 +73,7 @@
     (and
       (is-at ?x ?orig)
       (oriented ?x ?o)
-      (or (connected-to ?orig ?dest ?o) (and (connected-to ?dest ?orig ?o2) (opposite ?o ?o2)))
+      (connected-to ?orig ?dest ?o)
       )
     :effect
     (and
@@ -123,13 +123,10 @@
     (and
       (holding ?p ?o)
       (is-at ?p ?z)
-      (is-at ?c ?z)
-      (emptyhand ?c)
-      )
+      (is-at ?c ?z))
     :effect
     (and
       (not (holding ?p ?o))
-      (not (emptyhand ?c))
       (holding ?c ?o)
       (emptyhand ?p)
       )
