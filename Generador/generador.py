@@ -32,7 +32,7 @@ DEFAULT_INIT = """   (next N E)
 """
 
 # Orientación asignada a cada dirección
-ORIENTACION = {"V": ["N", "S"], "H": ["W", "E"]}
+ORIENTACION = {"V": ["S", "N"], "H": ["E", "W"]}
 
 ## Puntos obtenidos al entregar a cada personaje cada tipo de objeto
 PUNTOS = {
@@ -83,7 +83,7 @@ DATOS_REQ = {
   7: ["numero de jugadores"],
 }
 
-ZONAS_RE = re.compile("([\w\d]*?)\[([\w\d\-]*?)\](?:\[([\w\d\-]*?)\])?")
+ZONAS_RE = re.compile("([\w\d]*?)\[([\w\d\- ]*?)\](?:\[([\w\d]*?)\])?")
 DISTS_RE = re.compile("=(\d*?)=")
 
 
@@ -210,20 +210,18 @@ def get_goal(num_domain, datos, entidades):
     goal = input("Introduzca el objetivo: ").lower().strip()
     return "   {}\n".format(goal)
   else:
-    raise NotImplementedError(
-      "Objetivo para ejercicio 4 y superior no implementado")
+    raise NotImplementedError("Objetivo para ejercicio 4 y superior no implementado")
 
 
 def datos_personajes(num_domain, entidades):
   """Genera datos de personajes"""
-
+  NPC = {"Princesa", "Principe", "Bruja", "Profesor", "Leonardo", "Player"}
   datos = ""
   for nombre, tipo in entidades.items():
-    if tipo in {
-        "Princesa", "Principe", "Bruja", "Profesor", "Leonardo", "Player"
-    }:
-      datos += "   (emptyhand {})\n".format(nombre)
+    if tipo in NPC and num_domain >= 2:
+      pass # FIXME: TODO
     if tipo in {"Player"}:
+      datos += "   (emptyhand {})\n".format(nombre)
       datos += "   (oriented {} S)\n".format(nombre)
       if num_domain >= 2:
         datos += "   (= (total-distance {}) 0)\n".format(nombre)

@@ -10,7 +10,7 @@ import subprocess
 
 def generaSoluciones(dominio, i, problema, j):
   salida = "Ejercicios/Ej{i}soluciones/Plan_problema{j}.txt".format(i=i, j=j)
-  flags = "-O -g 1 -h 1" if i > 1 else ""
+  flags = "" #"-O" if i > 1 else ""
   process = subprocess.run(
     "./Metric-FF/ff {} -o Ejercicios/{} -f Ejercicios/{} > {}".format(flags,dominio, problema, salida),
     shell=True,
