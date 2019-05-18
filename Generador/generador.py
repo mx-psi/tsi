@@ -121,14 +121,14 @@ def parsea(entrada, num_zonas, start):
     zona_previa = None
 
     for nombre_zona, objetos, tipo in datos_zonas:
-      entidades[nombre_zona] = tipo if tipo != '' else "Zona"
+      entidades[nombre_zona] = "Zona"
 
-      if nombre_zona not in zonas: zonas[nombre_zona] = set()
+      if nombre_zona not in zonas: zonas[nombre_zona] = (set(), tipo)
 
       for objeto in objetos.split():
         nombre, tipo = objeto.split("-")
         entidades[nombre] = tipo
-        zonas[nombre_zona].add(nombre)
+        zonas[nombre_zona][0].add(nombre)
 
       if zona_previa is not None:
         conexiones.append((zona_previa, nombre_zona, direccion.strip()))
@@ -221,8 +221,11 @@ def datos_personajes(num_domain, entidades):
     if tipo in NPC and num_domain >= 2:
       pass # FIXME: TODO
     if tipo in {"Player"}:
-      datos += "   (emptyhand {})\n".format(nombre)
       datos += "   (oriented {} S)\n".format(nombre)
+      if num_domain <= 2:
+        datos += "   (emptyhand {})\n".format(nombre)
+      else:
+        datos += "   (empty mano {})\n".format(nombre)
       if num_domain >= 2:
         datos += "   (= (total-distance {}) 0)\n".format(nombre)
 
@@ -248,13 +251,19 @@ def genera_pddl(entrada):
   init = DEFAULT_INIT
 
   for nombre, tipo in entidades.items():
-    objects += "   {nombre} - {tipo}\n".format(nombre=nombre, tipo=tipo)
+    if tipo.lower() == "zapatillas" or tipo.lower() == "bikini":
+      objects += "   {} - {}\n".format(nombre, "Herramienta")
+      init += "   (is-type {} {})\n".format(nombre, tipo)
+    else:
+      objects += "   {} - {}\n".format(nombre, tipo)
 
   for z1, z2, d in conexiones:
     init += "   (connected-to {} {} {})\n".format(z1, z2, ORIENTACION[d][0])
     init += "   (connected-to {} {} {})\n".format(z2, z1, ORIENTACION[d][1])
 
-  for zona, localizables in zonas.items():
+  for zona, (localizables, tipo) in zonas.items():
+    if tipo != '':
+      init += "   (is-type {} {})\n".format(zona, tipo)
     for localizable in localizables:
       init += "   (is-at {} {})\n".format(localizable, zona)
 
