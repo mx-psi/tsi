@@ -168,13 +168,14 @@ def lee_datos(entrada):
     lineno += 1
     if linea.strip() == "": continue
     if ":" in linea:
-      clave, valor = linea.split(":")
+      j = linea.find(":")
+      clave, valor = linea[:j], linea[j+1:]
 
       if clave.strip().lower() in datos:
         raise ParseError(lineno, "Variable '{}' duplicada".format(clave))
 
       if valor.startswith("["):
-        datos[clave.strip().lower()] = parsea_lista(valor.strip()[1:-1])
+        datos[clave.strip().lower()] = parsea_lista(valor.strip()[1:-1], lineno)
       else:
         datos[clave.strip().lower()] = valor.strip().lower()
 
@@ -220,8 +221,14 @@ def datos_personajes(num_domain, entidades):
 
   datos = ""
   for nombre, tipo in entidades.items():
-    if tipo in NPC or tipo in Objetos and num_domain >= 4:
-      datos += "    (is-type {} {})\n".format(nombre, tipo)
+    if tipo in NPC or tipo in Objetos:
+      if num_domain >= 4:
+        datos += "   (is-type {} {})\n".format(nombre, tipo)
+
+    if tipo in NPC:
+      if num_domain >= 5:
+        datos += "   (= (cur-objects {}) 0)\n".format(nombre)
+
     if tipo in {"player"}: ## FIXME: Con diccionario de cosas que hacer?
       datos += "   (oriented {} S)\n".format(nombre)
 
@@ -259,7 +266,7 @@ def genera_pddl(entrada):
   init = DEFAULT_INIT
 
   for nombre, tipo in entidades.items():
-    if tipo.lower() == "zapatillas" or tipo.lower() == "bikini":
+    if tipo.lower() == "zapatilla" or tipo.lower() == "bikini":
       objects += "   {} - {}\n".format(nombre, "Herramienta")
       init += "   (is-type {} {})\n".format(nombre, tipo)
     else:
@@ -284,7 +291,11 @@ def genera_pddl(entrada):
   if num_domain >= 4:
     for personaje, objetos in PUNTOS.items():
       for objeto, puntos in objetos.items():
-        init += "  (= (reward {} {}) {})\n".format(objeto, personaje, puntos)
+        init += "   (= (reward {} {}) {})\n".format(objeto, personaje, puntos)
+
+  if num_domain >= 5:
+    for nombre,num in datos["bolsillo"]:
+      init += "   (= (max-objects {}) {})\n".format(nombre, num)
 
   return TEMPLATE.format(nombre=datos["problema"],
                          dominio=datos["dominio"],

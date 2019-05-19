@@ -25,7 +25,6 @@ if __name__ == "__main__":
 
     dominio = "Ej{}dominio.pddl".format(i)
 
-    print(problemas)
     for problema in problemas:
       j = problema[-6]
       print("Generando soluciones para el problema {} del dominio {}".format(
