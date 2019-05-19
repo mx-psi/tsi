@@ -201,7 +201,7 @@ def get_metric(num_domain):
   if num_domain == 1:
     return ""
   else:
-    return "   (:metric minimize (total-distance))\n"
+    return "   (:metric minimize (total-distance player1))\n"
 
 
 def get_goal(num_domain, datos, entidades):
@@ -210,7 +210,8 @@ def get_goal(num_domain, datos, entidades):
     goal = input("Introduzca el objetivo: ").lower().strip()
     return "   {}\n".format(goal)
   else:
-    raise NotImplementedError("Objetivo para ejercicio 4 y superior no implementado")
+    raise NotImplementedError(
+      "Objetivo para ejercicio 4 y superior no implementado")
 
 
 def datos_personajes(num_domain, entidades):
@@ -219,13 +220,14 @@ def datos_personajes(num_domain, entidades):
   datos = ""
   for nombre, tipo in entidades.items():
     if tipo in NPC and num_domain >= 2:
-      pass # FIXME: TODO
+      pass  # FIXME: TODO
     if tipo in {"Player"}:
       datos += "   (oriented {} S)\n".format(nombre)
       if num_domain <= 2:
         datos += "   (emptyhand {})\n".format(nombre)
       else:
         datos += "   (empty mano {})\n".format(nombre)
+        datos += "   (empty mochila {})\n".format(nombre)
       if num_domain >= 2:
         datos += "   (= (total-distance {}) 0)\n".format(nombre)
 

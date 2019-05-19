@@ -1,5 +1,5 @@
 (define (domain Ejercicio3)
-  (:requirements :strips :typing :adl :fluents)
+  (:requirements :strips :typing :adl)
 
   (:types
     Tipo Slot Orientacion Zona Localizable  - object
@@ -124,6 +124,8 @@
     (and
       (holding-in ?x mano ?o)
       (is-at ?x ?z)
+      (not (is-type ?z bosque))
+      (not (is-type ?z agua))
       )
     :effect
     (and
