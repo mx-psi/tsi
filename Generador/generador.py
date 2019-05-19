@@ -127,7 +127,7 @@ def parsea(entrada, num_zonas, start):
 
       for objeto in objetos.split():
         nombre, tipo = objeto.split("-")
-        entidades[nombre] = tipo
+        entidades[nombre] = tipo.lower()
         zonas[nombre_zona][0].add(nombre)
 
       if zona_previa is not None:
@@ -209,27 +209,33 @@ def get_goal(num_domain, datos, entidades):
   if num_domain <= 3:
     goal = input("Introduzca el objetivo: ").lower().strip()
     return "   {}\n".format(goal)
-  else:
-    raise NotImplementedError(
-      "Objetivo para ejercicio 4 y superior no implementado")
+  else: ## FIXME: ¿Obtener nombre jugador
+    return "   (= (total-points {}) {})\n".format("player1", datos["puntos_totales"])
 
 
 def datos_personajes(num_domain, entidades):
   """Genera datos de personajes"""
-  NPC = {"Princesa", "Principe", "Bruja", "Profesor", "Leonardo", "Player"}
+  NPC = {"princesa", "principe", "bruja", "profesor", "leonardo"}
+  Objetos = {"oscar", "manzana", "oro", "rosa", "algoritmo"}
+
   datos = ""
   for nombre, tipo in entidades.items():
-    if tipo in NPC and num_domain >= 2:
-      pass  # FIXME: TODO
-    if tipo in {"Player"}:
+    if tipo in NPC or tipo in Objetos and num_domain >= 4:
+      datos += "    (is-type {} {})\n".format(nombre, tipo)
+    if tipo in {"player"}: ## FIXME: Con diccionario de cosas que hacer?
       datos += "   (oriented {} S)\n".format(nombre)
+
       if num_domain <= 2:
         datos += "   (emptyhand {})\n".format(nombre)
       else:
         datos += "   (empty mano {})\n".format(nombre)
         datos += "   (empty mochila {})\n".format(nombre)
+
       if num_domain >= 2:
         datos += "   (= (total-distance {}) 0)\n".format(nombre)
+
+      if num_domain >= 4:
+        datos += "   (= (total-points {}) 0)\n".format(nombre)
 
   return datos
 
@@ -276,14 +282,9 @@ def genera_pddl(entrada):
   init += datos_personajes(num_domain, entidades)
 
   if num_domain >= 4:
-    init += "  (= (total-points) {})\n".format(datos["puntos_totales"])
-    ## FIXME: Inicializar puntos de cada jugador a 0
-    raise NotImplementedError("Inicialización de puntos no implementada")
-
-    ## FIXME: De alguna forma hay que indicar personaje como tipo
-    for personaje, objetos in PUNTOS:
+    for personaje, objetos in PUNTOS.items():
       for objeto, puntos in objetos.items():
-        init += "  (= (reward {} {}) {})\n".format(personaje, objeto, puntos)
+        init += "  (= (reward {} {}) {})\n".format(objeto, personaje, puntos)
 
   return TEMPLATE.format(nombre=datos["problema"],
                          dominio=datos["dominio"],
