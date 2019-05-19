@@ -2,45 +2,44 @@
   (problem problema1)
   (:domain ejercicio3)
   (:objects
-   z11 - Zona
-   z16 - Zona
-   z8 - Zona
-   z9 - Zona
-   z7 - Zona
-   zapatillas1 - Herramienta
-   zapatillas2 - Herramienta
-   z1 - Zona
-   z10 - Zona
    z12 - Zona
-   oscar1 - Oscar
-   profesor1 - Profesor
-   z20 - Zona
-   z24 - Zona
-   bruja1 - Bruja
-   z15 - Zona
+   rosa1 - rosa
+   z9 - Zona
+   princesa1 - princesa
+   z7 - Zona
    z23 - Zona
-   algoritmo1 - Algoritmo
-   manzana1 - Manzana
-   leonardo1 - Leonardo
-   principe1 - Principe
-   z25 - Zona
-   oro1 - Oro
-   z22 - Zona
-   z19 - Zona
-   z17 - Zona
-   player1 - Player
-   z2 - Zona
-   rosa1 - Rosa
-   princesa1 - Princesa
-   z5 - Zona
-   z6 - Zona
-   bikini1 - Herramienta
-   z21 - Zona
-   z3 - Zona
+   z24 - Zona
    z18 - Zona
-   z4 - Zona
+   algoritmo1 - algoritmo
    z14 - Zona
+   z16 - Zona
+   zapatilla1 - Herramienta
+   z4 - Zona
+   z6 - Zona
+   oscar1 - oscar
+   z2 - Zona
+   player1 - player
+   z25 - Zona
+   z1 - Zona
+   bruja1 - bruja
+   leonardo1 - leonardo
+   z5 - Zona
+   z11 - Zona
+   z21 - Zona
+   z8 - Zona
+   bikini1 - Herramienta
+   z17 - Zona
+   principe1 - principe
+   z20 - Zona
+   z10 - Zona
+   z15 - Zona
+   z19 - Zona
+   z3 - Zona
    z13 - Zona
+   z22 - Zona
+   oro1 - oro
+   manzana1 - manzana
+   profesor1 - profesor
 )
   (:init
    (next N E)
@@ -51,8 +50,8 @@
    (opposite S N)
    (opposite E W)
    (opposite W E)
-   (is-type zapatillas1 Zapatillas)
-   (is-type bikini1 Bikini)
+   (is-type zapatilla1 zapatilla)
+   (is-type bikini1 bikini)
    (connected-to z2 z3 E)
    (connected-to z3 z2 W)
    (connected-to z6 z7 E)
@@ -103,46 +102,44 @@
    (connected-to z20 z15 N)
    (connected-to z20 z25 S)
    (connected-to z25 z20 N)
-   (is-type z19 Agua)
-   (is-at zapatillas2 z19)
-   (is-type zapatillas2 Zapatillas)
-   (is-type z16 Arena)
-   (is-at algoritmo1 z16)
-   (is-type z8 Precipicio)
-   (is-type z9 Arena)
-   (is-type z7 Piedra)
-   (is-at bikini1 z7)
-   (is-at leonardo1 z7)
    (is-type z12 Arena)
-   (is-at oro1 z12)
    (is-at rosa1 z12)
-   (is-type z20 Piedra)
-   (is-type z24 Arena)
-   (is-at manzana1 z24)
-   (is-type z15 Arena)
-   (is-type z14 Bosque)
-   (is-type z4 Piedra)
-   (is-type z10 Bosque)
-   (is-type z22 Bosque)
-   (is-type z11 Precipicio)
-   (is-type z17 Arena)
-   (is-at oscar1 z17)
-   (is-at zapatillas1 z17)
-   (is-at player1 z17)
-   (is-type z2 Bosque)
-   (is-type z25 Bosque)
+   (is-at oro1 z12)
    (is-type z23 Piedra)
    (is-at bruja1 z23)
-   (is-type z5 Precipicio)
+   (is-type z9 Arena)
+   (is-type z7 Piedra)
+   (is-at leonardo1 z7)
+   (is-at bikini1 z7)
    (is-type z13 Piedra)
    (is-at princesa1 z13)
-   (is-type z1 Piedra)
-   (is-at principe1 z1)
+   (is-type z18 Bosque)
+   (is-type z14 Bosque)
+   (is-type z16 Arena)
+   (is-at algoritmo1 z16)
+   (is-type z4 Piedra)
+   (is-type z6 Agua)
+   (is-type z15 Arena)
+   (is-type z2 Bosque)
+   (is-type z25 Bosque)
+   (is-type z5 Precipicio)
+   (is-type z11 Precipicio)
    (is-type z21 Piedra)
    (is-at profesor1 z21)
+   (is-type z8 Precipicio)
+   (is-type z17 Arena)
+   (is-at player1 z17)
+   (is-at zapatilla1 z17)
+   (is-at oscar1 z17)
+   (is-type z20 Piedra)
+   (is-type z10 Bosque)
+   (is-type z19 Agua)
    (is-type z3 Arena)
-   (is-type z18 Bosque)
-   (is-type z6 Agua)
+   (is-type z24 Arena)
+   (is-at manzana1 z24)
+   (is-type z22 Bosque)
+   (is-type z1 Piedra)
+   (is-at principe1 z1)
    (= (distance z2 z3) 2)
    (= (distance z3 z2) 2)
    (= (distance z6 z7) 6)
@@ -193,14 +190,20 @@
    (= (distance z20 z15) 4)
    (= (distance z20 z25) 2)
    (= (distance z25 z20) 2)
+    (is-type princesa1 princesa)
    (oriented player1 S)
    (empty mano player1)
    (empty mochila player1)
    (= (total-distance player1) 0)
+    (is-type bruja1 bruja)
+    (is-type leonardo1 leonardo)
+    (is-type principe1 principe)
+    (is-type profesor1 profesor)
 )
   (:goal
-    (and (holding leonardo1 oscar1) (holding bruja1 manzana1) (holding princesa1 rosa1) (holding profesor1 algoritmo1) (holding principe1 oro1))
+   (and (holding leonardo1 oscar1) (holding bruja1 manzana1) (holding princesa1 rosa1) (holding principe1 oro1) (holding profesor1 algoritmo1))
 )
      (:metric minimize (total-distance player1))
 
 )
+  

@@ -13,7 +13,7 @@
   (:constants
     N S E W - Orientacion
     mano mochila - Slot
-    Oscar Manzana Rosa Algoritmo Oro Princesa Principe Bruja Profesor Leonardo zapatillas bikini bosque agua precipicio arena piedra - Tipo)
+    Oscar Manzana Rosa Algoritmo Oro Princesa Principe Bruja Profesor Leonardo zapatilla bikini bosque agua precipicio arena piedra - Tipo)
 
   (:predicates
     ;; z1 está al o de z2
@@ -92,11 +92,10 @@
       (oriented ?x ?o)
       (connected-to ?orig ?dest ?o)
       (not (is-type ?dest Precipicio))
-      (or
-        (and (not (is-type ?dest bosque)) (not (is-type ?dest agua)))
-        (and (is-type ?dest bosque) (is-type ?h zapatillas) (holding-in ?x ?b ?h))
-        (and (is-type ?dest agua) (is-type ?h bikini) (holding-in ?x ?b ?h))
-        )
+      (imply (is-type ?dest bosque)
+        (and (is-type ?h zapatilla) (holding-in ?x ?b ?h)))
+      (imply (is-type ?dest agua)
+        (and (is-type ?h bikini) (holding-in ?x ?b ?h)))
       )
     :effect
     (and
