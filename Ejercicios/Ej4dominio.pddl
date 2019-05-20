@@ -23,7 +23,7 @@
     (is-at ?c - Localizable ?z - Zona)
 
     ;; c está orientado
-    (oriented ?c - Personaje ?o - Orientacion)
+    (oriented ?c - Player ?o - Orientacion)
 
     ;; En el sentido de las agujas del reloj, o1 va antes que o2
     (next ?o1 - Orientacion ?o2 - Orientacion)
@@ -55,7 +55,7 @@
 
   ;; gira a la izquierda
   (:action turn-right
-    :parameters (?x - Personaje ?o1 - Orientacion ?o2 - Orientacion)
+    :parameters (?x - Player ?o1 - Orientacion ?o2 - Orientacion)
     :precondition
     (and
       (oriented ?x ?o1)
@@ -70,7 +70,7 @@
 
   ;; gira a la derecha
   (:action turn-left
-    :parameters (?x - Personaje ?o1 - Orientacion ?o2 - Orientacion)
+    :parameters (?x - Player ?o1 - Orientacion ?o2 - Orientacion)
     :precondition
     (and
       (oriented ?x ?o1)
