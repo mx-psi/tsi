@@ -148,12 +148,13 @@ def parsea(entrada, num_zonas, start):
 
 
 def parsea_lista(lista, lineno):
-  """Parsea una lista"""
-  valores = []
+  """Parsea una lista como diccionario"""
+  valores = dict()
   for dato in lista.split():
     if ':' not in dato:
       raise ParseError(lineno, "Lista '{}' mal formada".format(lista))
-    valores.append(tuple(dato.split(':')))
+    clave, valor = dato.split(':')
+    valores[clave] = valor
   return valores
 
 
@@ -169,13 +170,14 @@ def lee_datos(entrada):
     if linea.strip() == "": continue
     if ":" in linea:
       j = linea.find(":")
-      clave, valor = linea[:j], linea[j+1:]
+      clave, valor = linea[:j], linea[j + 1:]
 
       if clave.strip().lower() in datos:
         raise ParseError(lineno, "Variable '{}' duplicada".format(clave))
 
       if valor.startswith("["):
-        datos[clave.strip().lower()] = parsea_lista(valor.strip()[1:-1], lineno)
+        datos[clave.strip().lower()] = parsea_lista(valor.strip()[1:-1],
+                                                    lineno)
       else:
         datos[clave.strip().lower()] = valor.strip().lower()
 
@@ -207,11 +209,40 @@ def get_metric(num_domain):
 
 def get_goal(num_domain, datos, entidades):
   """Obten objetivo"""
+
+  jugadores = [
+    nombre for nombre, tipo in entidades.items()
+    if tipo in {"player", "dealer", "picker"}
+  ]
+  num_player = len(jugadores)
+
   if num_domain <= 3:
     goal = input("Introduzca el objetivo: ").lower().strip()
     return "   {}\n".format(goal)
-  else: ## FIXME: ¿Obtener nombre jugador
-    return "   (= (total-points {}) {})\n".format("player1", datos["puntos_totales"])
+  elif num_domain <= 5:
+    if num_player != 1:
+      raise ParseError(
+        "-", "debe haber exactamente un jugador en el dominio (hay {})".format(
+          num_player))
+    return "   (= (total-points {}) {})\n".format(jugadores[0],
+                                                  datos["puntos_totales"])
+  else:
+    if num_player != 2:
+      raise ParseError(
+        "-",
+        "debe haber exactamente dos jugadores en el dominio (hay {})".format(
+          num_player))
+
+    objetivos = [
+      "(= (+ (total-points {}) (total-points {})) {})".format(
+        jugadores[0], jugadores[1], datos["puntos_totales"])
+    ]
+
+    for nombre in jugadores:
+      objetivos.append("(>= (total-points {}) {})".format(
+        nombre, datos["puntos_jugador"][nombre]))
+
+    return "   (and " + " ".join(objetivos) + ")\n"
 
 
 def datos_personajes(num_domain, entidades):
@@ -229,7 +260,7 @@ def datos_personajes(num_domain, entidades):
       if num_domain >= 5:
         datos += "   (= (cur-objects {}) 0)\n".format(nombre)
 
-    if tipo in {"player"}: ## FIXME: Con diccionario de cosas que hacer?
+    if tipo in {"player"}:  ## FIXME: Con diccionario de cosas que hacer?
       datos += "   (oriented {} S)\n".format(nombre)
 
       if num_domain <= 2:
@@ -294,7 +325,7 @@ def genera_pddl(entrada):
         init += "   (= (reward {} {}) {})\n".format(objeto, personaje, puntos)
 
   if num_domain >= 5:
-    for nombre,num in datos["bolsillo"]:
+    for nombre, num in datos["bolsillo"].items():
       init += "   (= (max-objects {}) {})\n".format(nombre, num)
 
   return TEMPLATE.format(nombre=datos["problema"],
