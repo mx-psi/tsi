@@ -1,0 +1,8 @@
+graph{
+rankdir="BT";
+{Orientacion Zona Localizable} -- object;
+{Personaje Objeto} -- Localizable;
+{Player NPC} -- Personaje;
+{Princesa Principe Bruja Profesor Leonardo} -- NPC;
+{Oscar Manzana Rosa Algoritmo Oro} -- Objeto;
+}
