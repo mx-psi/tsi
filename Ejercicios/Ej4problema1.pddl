@@ -46,10 +46,6 @@
    (next E S)
    (next S W)
    (next W N)
-   (opposite N S)
-   (opposite S N)
-   (opposite E W)
-   (opposite W E)
    (is-type zapatilla1 zapatilla)
    (is-type bikini1 bikini)
    (connected-to z2 z3 E)
@@ -237,4 +233,3 @@
      (:metric minimize (total-distance player1))
 
 )
-  

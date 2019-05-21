@@ -23,9 +23,6 @@
     ;; En el sentido de las agujas del reloj, o1 va antes que o2
     (next ?o1 - Orientacion ?o2 - Orientacion)
 
-    ;; o1 es la orientación opuesta a o2
-    (opposite ?o1 ?o2 - Orientacion)
-
     ;; p tiene en la mano o
     (holding ?c - Personaje ?o - Objeto)
 

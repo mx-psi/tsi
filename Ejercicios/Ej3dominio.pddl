@@ -1,5 +1,5 @@
 (define (domain Ejercicio3)
-  (:requirements :strips :typing :adl)
+  (:requirements :strips :typing :adl :fluents)
 
   (:types
     Tipo Slot Orientacion Zona Localizable  - object
@@ -11,7 +11,7 @@
     )
 
   (:constants
-    N S E W - Orientacion
+    N S E W - Orientacionx
     mano mochila - Slot
     zapatilla bikini bosque agua precipicio arena piedra - Tipo)
 
@@ -27,7 +27,6 @@
 
     ;; En el sentido de las agujas del reloj, o1 va antes que o2
     (next ?o1 - Orientacion ?o2 - Orientacion)
-    (opposite ?o1 ?o2 - Orientacion)
 
     ;; NPC c tiene el objeto ?o
     (holding ?c - NPC ?o - Objeto)

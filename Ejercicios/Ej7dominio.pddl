@@ -1,4 +1,4 @@
-(define (domain Ejercicio4)
+(define (domain Ejercicio7)
   (:requirements :strips :typing :adl :fluents)
 
   (:types
@@ -6,6 +6,7 @@
     Personaje Objeto - Localizable ;; Tienen localización
     Player NPC - Personaje ;; Personajes
     Princesa Principe Bruja Profesor Leonardo - NPC
+    Dealer Picker - Player
     Herramienta Entregable - Objeto ;; Pueden ser recogidos
     Oscar Manzana Rosa Algoritmo Oro - Entregable
     )
@@ -50,7 +51,13 @@
     (total-points ?p - Player)
 
     ;; Recompensa obtenida con un par objeto - personaje
-    (reward ?objecttype - Tipo ?npctype - Tipo))
+    (reward ?objecttype - Tipo ?npctype - Tipo)
+
+    ;; Máximo número de objetos que tiene un NPC
+    (max-objects ?npc - NPC)
+
+    ;; Número actual de objetos
+    (cur-objects ?npc - NPC))
 
   ;; gira a la izquierda
   (:action turn-right
@@ -106,7 +113,7 @@
 
   ;; Coge un objeto
   (:action pick-up
-    :parameters (?x - Player ?o - Objeto ?z - Zona)
+    :parameters (?x - Picker ?o - Objeto ?z - Zona)
     :precondition
     (and
       (empty mano ?x)
@@ -141,7 +148,7 @@
 
   ;; Da un objeto a un personaje
   (:action give
-    :parameters (?p - Player ?o - Entregable ?to - Tipo ?c - NPC ?tc - Tipo ?z - Zona)
+    :parameters (?p - Dealer ?o - Entregable ?to - Tipo ?c - NPC ?tc - Tipo ?z - Zona)
     :precondition
     (and
       (holding-in ?p mano ?o)
@@ -149,6 +156,7 @@
       (is-at ?c ?z)
       (is-type ?o ?to)
       (is-type ?c ?tc)
+      (< (cur-objects ?c) (max-objects ?c))
       )
     :effect
     (and
@@ -156,6 +164,7 @@
       (holding ?c ?o)
       (empty mano ?p)
       (increase (total-points ?p) (reward ?to ?tc))
+      (increase (cur-objects ?c) 1)
       )
     )
 
@@ -173,5 +182,23 @@
       (not (holding-in ?p ?orig ?o))
       (empty ?orig ?p)
       (holding-in ?p ?dest ?o))
+    )
+
+  (:action exchange
+    :parameters (?p1 - Picker ?p2 - Dealer ?o - Objeto ?z - Zona)
+    :precondition
+    (and
+      (is-at ?p1 ?z)
+      (is-at ?p2 ?z)
+      (holding-in ?p1 mano ?o)
+      (empty mano ?p2)
+      )
+    :effect
+    (and
+      (not (holding-in ?p1 mano ?o))
+      (not (empty mano ?p2))
+      (holding-in ?p2 mano ?o)
+      (empty mano ?p1)
+      )
     )
 )

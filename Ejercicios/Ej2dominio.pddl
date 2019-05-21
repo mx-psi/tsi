@@ -1,5 +1,5 @@
 (define (domain Ejercicio2)
-  (:requirements :strips :typing :adl)
+  (:requirements :strips :typing :adl :fluents)
 
   (:types
     Orientacion Zona Localizable - object
@@ -22,7 +22,6 @@
 
     ;; En el sentido de las agujas del reloj, o1 va antes que o2
     (next ?o1 - Orientacion ?o2 - Orientacion)
-    (opposite ?o1 ?o2 - Orientacion)
 
     ;; p tiene en la mano o
     (holding ?c - Personaje ?o - Objeto)
