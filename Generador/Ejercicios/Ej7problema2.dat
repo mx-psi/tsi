@@ -1,0 +1,18 @@
+Dominio:Ejercicio7
+Problema:Problema2
+numero de zonas:16
+puntos_totales:30
+puntos_jugador:[player2:20]
+numero de jugadores:2
+bolsillo:[principe1:1 leonardo1:0 princesa1:1 profesor1:1 bruja1:1]
+
+H -> z5[bikini1-Bikini][Piedra]=2=z6[][Agua]
+H -> z7[][Bosque]=1=z8[algoritmo1-Algoritmo][Arena]
+H -> z9[principe1-Principe][Piedra]=2=z10[rosa1-Rosa][Arena]=1=z11[oro1-Oro][Piedra]=2=z12[profesor1-Profesor][Arena]
+H -> z13[leonardo1-Leonardo][Piedra]=1=z14[zapatilla1-Zapatilla][Arena]
+H -> z15[][Piedra]=2=z16[bruja1-Bruja][Arena]
+
+V -> z1[player1-Picker][Piedra]=1=z5[][Piedra]
+V -> z2[manzana1-Manzana][Piedra]=2=z6[][Agua]=1=z10[][Arena]=2=z14[][Arena]
+V -> z3[oscar1-Oscar][Arena]=1=z7[][Bosque]=2=z11[][Piedra]=1=z15[player2-Dealer][Piedra]
+V -> z4[princesa1-Princesa][Piedra]=2=z8[][Arena]

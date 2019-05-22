@@ -11,7 +11,7 @@
     )
 
   (:constants
-    N S E W - Orientacionx
+    N S E W - Orientacion
     mano mochila - Slot
     zapatilla bikini bosque agua precipicio arena piedra - Tipo)
 

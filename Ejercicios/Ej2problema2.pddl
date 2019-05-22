@@ -1,34 +1,34 @@
 (define
   (problem problema2)
-  (:domain ejercicio1)
+  (:domain ejercicio2)
   (:objects
-   manzana1 - manzana
-   z16 - Zona
-   z6 - Zona
-   z11 - Zona
-   z9 - Zona
-   algoritmo1 - algoritmo
-   princesa1 - princesa
-   z8 - Zona
-   player1 - player
-   z4 - Zona
-   principe1 - principe
-   z7 - Zona
-   z5 - Zona
-   z2 - Zona
-   bruja1 - bruja
-   z10 - Zona
    z3 - Zona
-   z13 - Zona
-   z1 - Zona
-   z12 - Zona
-   leonardo1 - leonardo
-   oscar1 - oscar
-   oro1 - oro
-   z15 - Zona
+   z16 - Zona
    profesor1 - profesor
-   z14 - Zona
+   princesa1 - princesa
+   z5 - Zona
+   bruja1 - bruja
+   oro1 - oro
+   manzana1 - manzana
+   algoritmo1 - algoritmo
+   z2 - Zona
+   oscar1 - oscar
+   z4 - Zona
    rosa1 - rosa
+   z10 - Zona
+   leonardo1 - leonardo
+   z13 - Zona
+   player1 - player
+   z15 - Zona
+   z1 - Zona
+   z9 - Zona
+   z8 - Zona
+   z12 - Zona
+   principe1 - principe
+   z6 - Zona
+   z7 - Zona
+   z11 - Zona
+   z14 - Zona
 )
   (:init
    (next N E)
@@ -65,23 +65,55 @@
    (connected-to z15 z11 N)
    (connected-to z4 z8 S)
    (connected-to z8 z4 N)
-   (is-at manzana1 z2)
-   (is-at bruja1 z16)
-   (is-at rosa1 z10)
-   (is-at player1 z1)
    (is-at oscar1 z3)
-   (is-at leonardo1 z13)
-   (is-at profesor1 z12)
-   (is-at oro1 z11)
+   (is-at bruja1 z16)
+   (is-at manzana1 z2)
+   (is-at player1 z1)
    (is-at principe1 z9)
-   (is-at algoritmo1 z8)
+   (is-at profesor1 z12)
    (is-at princesa1 z4)
+   (is-at rosa1 z10)
+   (is-at leonardo1 z13)
+   (is-at oro1 z11)
+   (is-at algoritmo1 z8)
+   (= (distance z5 z6) 2)
+   (= (distance z6 z5) 2)
+   (= (distance z7 z8) 1)
+   (= (distance z8 z7) 1)
+   (= (distance z9 z10) 2)
+   (= (distance z10 z9) 2)
+   (= (distance z10 z11) 1)
+   (= (distance z11 z10) 1)
+   (= (distance z11 z12) 2)
+   (= (distance z12 z11) 2)
+   (= (distance z13 z14) 1)
+   (= (distance z14 z13) 1)
+   (= (distance z15 z16) 2)
+   (= (distance z16 z15) 2)
+   (= (distance z1 z5) 1)
+   (= (distance z5 z1) 1)
+   (= (distance z2 z6) 2)
+   (= (distance z6 z2) 2)
+   (= (distance z6 z10) 1)
+   (= (distance z10 z6) 1)
+   (= (distance z10 z14) 2)
+   (= (distance z14 z10) 2)
+   (= (distance z3 z7) 1)
+   (= (distance z7 z3) 1)
+   (= (distance z7 z11) 2)
+   (= (distance z11 z7) 2)
+   (= (distance z11 z15) 1)
+   (= (distance z15 z11) 1)
+   (= (distance z4 z8) 2)
+   (= (distance z8 z4) 2)
    (oriented player1 S)
    (emptyhand player1)
+   (= (total-distance player1) 0)
 )
   (:goal
    (and (holding leonardo1 oscar1) (holding bruja1 manzana1) (holding princesa1 rosa1) (holding principe1 oro1) (holding profesor1 algoritmo1))
 )
-  
+     (:metric minimize (total-distance player1))
+
 )
   

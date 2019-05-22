@@ -49,6 +49,7 @@
 
     ;; Puntos totales
     (total-points ?p - Dealer)
+    (sum-points)
 
     ;; Recompensa obtenida con un par objeto - personaje
     (reward ?objecttype - Tipo ?npctype - Tipo)
@@ -164,6 +165,7 @@
       (holding ?c ?o)
       (empty mano ?p)
       (increase (total-points ?p) (reward ?to ?tc))
+      (increase (sum-points) (reward ?to ?tc))
       (increase (cur-objects ?c) 1)
       )
     )

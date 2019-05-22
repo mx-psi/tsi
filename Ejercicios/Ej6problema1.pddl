@@ -2,45 +2,45 @@
   (problem problema1)
   (:domain ejercicio6)
   (:objects
-   z25 - Zona
-   z21 - Zona
-   princesa1 - princesa
-   z10 - Zona
-   z15 - Zona
-   z22 - Zona
-   player1 - player
-   z5 - Zona
-   z12 - Zona
+   principe1 - principe
+   z19 - Zona
    z20 - Zona
+   z9 - Zona
+   z2 - Zona
+   z12 - Zona
+   z18 - Zona
+   z3 - Zona
    z24 - Zona
-   z13 - Zona
-   zapatilla1 - Herramienta
+   z5 - Zona
+   z17 - Zona
+   profesor1 - profesor
+   oscar3 - oscar
+   z15 - Zona
+   z23 - Zona
    z14 - Zona
+   player1 - player
+   z21 - Zona
+   z16 - Zona
+   bruja1 - bruja
+   manzana1 - manzana
+   oscar2 - oscar
+   princesa1 - princesa
+   z13 - Zona
+   z25 - Zona
+   z1 - Zona
+   z11 - Zona
+   z4 - Zona
+   z10 - Zona
+   player2 - player
+   z6 - Zona
+   z22 - Zona
+   z7 - Zona
+   zapatilla1 - Herramienta
+   oscar1 - oscar
+   bikini1 - Herramienta
+   manzana2 - manzana
    leonardo1 - leonardo
    z8 - Zona
-   z17 - Zona
-   z16 - Zona
-   z6 - Zona
-   oscar2 - oscar
-   z2 - Zona
-   z1 - Zona
-   z19 - Zona
-   oscar1 - oscar
-   manzana2 - manzana
-   z9 - Zona
-   z23 - Zona
-   z7 - Zona
-   bruja1 - bruja
-   z3 - Zona
-   z18 - Zona
-   principe1 - principe
-   z11 - Zona
-   bikini1 - Herramienta
-   oscar3 - oscar
-   manzana1 - manzana
-   player2 - player
-   z4 - Zona
-   profesor1 - profesor
 )
   (:init
    (next N E)
@@ -99,45 +99,45 @@
    (connected-to z20 z15 N)
    (connected-to z20 z25 S)
    (connected-to z25 z20 N)
-   (is-type z25 Bosque)
    (is-type z20 Piedra)
-   (is-type z7 Piedra)
-   (is-at bikini1 z7)
-   (is-at leonardo1 z7)
-   (is-type z10 Bosque)
-   (is-type z6 Agua)
-   (is-type z22 Bosque)
+   (is-type z24 Arena)
+   (is-at manzana1 z24)
+   (is-type z2 Bosque)
    (is-type z12 Arena)
    (is-at manzana2 z12)
    (is-at oscar2 z12)
-   (is-type z1 Piedra)
-   (is-at principe1 z1)
-   (is-type z13 Piedra)
-   (is-at princesa1 z13)
-   (is-type z14 Bosque)
-   (is-type z8 Precipicio)
+   (is-type z18 Bosque)
+   (is-type z3 Arena)
+   (is-type z5 Precipicio)
    (is-type z17 Arena)
+   (is-at zapatilla1 z17)
    (is-at oscar1 z17)
    (is-at player1 z17)
-   (is-at zapatilla1 z17)
-   (is-type z16 Arena)
-   (is-at oscar3 z16)
-   (is-type z3 Arena)
-   (is-type z11 Precipicio)
+   (is-type z15 Arena)
+   (is-type z23 Piedra)
+   (is-at bruja1 z23)
+   (is-at player2 z23)
+   (is-type z14 Bosque)
+   (is-type z19 Agua)
    (is-type z21 Piedra)
    (is-at profesor1 z21)
-   (is-type z19 Agua)
-   (is-type z5 Precipicio)
    (is-type z9 Arena)
-   (is-type z23 Piedra)
-   (is-at player2 z23)
-   (is-at bruja1 z23)
-   (is-type z15 Arena)
-   (is-type z24 Arena)
-   (is-at manzana1 z24)
-   (is-type z18 Bosque)
-   (is-type z2 Bosque)
+   (is-type z1 Piedra)
+   (is-at principe1 z1)
+   (is-type z11 Precipicio)
+   (is-type z16 Arena)
+   (is-at oscar3 z16)
+   (is-type z25 Bosque)
    (is-type z4 Piedra)
+   (is-type z10 Bosque)
+   (is-type z6 Agua)
+   (is-type z22 Bosque)
+   (is-type z7 Piedra)
+   (is-at bikini1 z7)
+   (is-at leonardo1 z7)
+   (is-type z13 Piedra)
+   (is-at princesa1 z13)
+   (is-type z8 Precipicio)
    (= (distance z2 z3) 2)
    (= (distance z3 z2) 2)
    (= (distance z6 z7) 6)
@@ -188,65 +188,66 @@
    (= (distance z20 z15) 4)
    (= (distance z20 z25) 2)
    (= (distance z25 z20) 2)
-   (is-type princesa1 princesa)
-   (= (cur-objects princesa1) 0)
+   (is-type principe1 principe)
+   (= (cur-objects principe1) 0)
+   (is-type profesor1 profesor)
+   (= (cur-objects profesor1) 0)
+   (is-type oscar3 oscar)
    (oriented player1 S)
    (empty mano player1)
    (empty mochila player1)
    (= (total-distance player1) 0)
    (= (total-points player1) 0)
-   (is-type leonardo1 leonardo)
-   (= (cur-objects leonardo1) 0)
-   (is-type oscar2 oscar)
-   (is-type oscar1 oscar)
-   (is-type manzana2 manzana)
    (is-type bruja1 bruja)
    (= (cur-objects bruja1) 0)
-   (is-type principe1 principe)
-   (= (cur-objects principe1) 0)
-   (is-type oscar3 oscar)
    (is-type manzana1 manzana)
+   (is-type oscar2 oscar)
+   (is-type princesa1 princesa)
+   (= (cur-objects princesa1) 0)
    (oriented player2 S)
    (empty mano player2)
    (empty mochila player2)
    (= (total-distance player2) 0)
    (= (total-points player2) 0)
-   (is-type profesor1 profesor)
-   (= (cur-objects profesor1) 0)
-   (= (reward Rosa Bruja) 5)
-   (= (reward Oscar Bruja) 4)
-   (= (reward Algoritmo Bruja) 1)
-   (= (reward Manzana Bruja) 10)
-   (= (reward Oro Bruja) 3)
-   (= (reward Rosa Leonardo) 1)
-   (= (reward Oscar Leonardo) 10)
-   (= (reward Algoritmo Leonardo) 4)
-   (= (reward Manzana Leonardo) 3)
-   (= (reward Oro Leonardo) 5)
-   (= (reward Rosa Profesor) 4)
-   (= (reward Oscar Profesor) 3)
-   (= (reward Algoritmo Profesor) 10)
-   (= (reward Manzana Profesor) 5)
-   (= (reward Oro Profesor) 1)
-   (= (reward Rosa Princesa) 10)
-   (= (reward Oscar Princesa) 5)
-   (= (reward Algoritmo Princesa) 3)
-   (= (reward Manzana Princesa) 1)
-   (= (reward Oro Princesa) 4)
-   (= (reward Rosa Principe) 3)
+   (is-type oscar1 oscar)
+   (is-type manzana2 manzana)
+   (is-type leonardo1 leonardo)
+   (= (cur-objects leonardo1) 0)
    (= (reward Oscar Principe) 1)
    (= (reward Algoritmo Principe) 5)
-   (= (reward Manzana Principe) 4)
    (= (reward Oro Principe) 10)
-   (= (max-objects profesor1) 4)
+   (= (reward Manzana Principe) 4)
+   (= (reward Rosa Principe) 3)
+   (= (reward Oscar Princesa) 5)
+   (= (reward Algoritmo Princesa) 3)
+   (= (reward Oro Princesa) 4)
+   (= (reward Manzana Princesa) 1)
+   (= (reward Rosa Princesa) 10)
+   (= (reward Oscar Leonardo) 10)
+   (= (reward Algoritmo Leonardo) 4)
+   (= (reward Oro Leonardo) 5)
+   (= (reward Manzana Leonardo) 3)
+   (= (reward Rosa Leonardo) 1)
+   (= (reward Oscar Bruja) 4)
+   (= (reward Algoritmo Bruja) 1)
+   (= (reward Oro Bruja) 3)
+   (= (reward Manzana Bruja) 10)
+   (= (reward Rosa Bruja) 5)
+   (= (reward Oscar Profesor) 3)
+   (= (reward Algoritmo Profesor) 10)
+   (= (reward Oro Profesor) 1)
+   (= (reward Manzana Profesor) 5)
+   (= (reward Rosa Profesor) 4)
    (= (max-objects principe1) 1)
-   (= (max-objects princesa1) 6)
    (= (max-objects bruja1) 2)
+   (= (max-objects profesor1) 4)
    (= (max-objects leonardo1) 3)
+   (= (max-objects princesa1) 6)
+   (= (sum-points) 0)
 )
   (:goal
-   (and (= (+ (total-points player1) (total-points player2)) 50) (>= (total-points player1) 20) (>= (total-points player2) 20))
+   (and (= (sum-points) 50) (>= (total-points player1) 20) (>= (total-points player2) 20))
 )
-     (:metric minimize (total-distance player1))
-
+  
 )
+  

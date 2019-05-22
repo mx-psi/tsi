@@ -79,12 +79,12 @@ DATOS_REQ = {
 ## Información necesaria para el jugador en cada dominio
 PLAYER_INFO = {
   1: ["(oriented {} S)", "(emptyhand {})"],
-  2: ["(oriented {} S)", "(emptyhand {})"],
-  3: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})"],
-  4: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})", "(= (total-points {}) 0)"],
-  5: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})", "(= (total-points {}) 0)"],
-  6: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})", "(= (total-points {}) 0)"],
-  7: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})"]
+  2: ["(oriented {} S)", "(emptyhand {})", "(= (total-distance {}) 0)"],
+  3: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})", "(= (total-distance {}) 0)"],
+  4: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})", "(= (total-distance {}) 0)"],
+  5: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})", "(= (total-distance {}) 0)"],
+  6: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})", "(= (total-distance {}) 0)"],
+  7: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})", "(= (total-distance {}) 0)"]
 }
 
 ## Tipos de NPC, objetos y jugadores
@@ -247,18 +247,17 @@ def get_metric(num_domain, ents):
 
 def get_goal(num_domain, datos, jugadores):
   """Obten objetivo"""
-
   if num_domain <= 3:
-    goal = input("Introduzca el objetivo: ").lower().strip()
+    goal = "(and (holding leonardo1 oscar1) (holding bruja1 manzana1) (holding princesa1 rosa1) (holding principe1 oro1) (holding profesor1 algoritmo1))"
     return "   {}\n".format(goal)
   elif num_domain <= 5:
-    if num_player != 1:
-      raise ParseError("-", "se esperaba 1 jugador, se obtuvieron {}".format(num_player))
-    return "   (= (total-points {}) {})\n".format(jugadores[0][0], datos["puntos_totales"])
+    if len(jugadores) != 1:
+      raise ParseError("-", "se esperaba 1 jugador, se obtuvieron {}".format(len(jugadores)))
+    return "   (>= (total-points {}) {})\n".format(jugadores[0][0], datos["puntos_totales"])
   else:
     objetivos = ["(= (sum-points) {})".format(datos["puntos_totales"])]
     try:
-      for nombre, tipo in nombres:
+      for nombre, tipo in jugadores:
         if tipo != "picker":
           objetivos.append("(>= (total-points {}) {})".format(nombre,
                                                               datos["puntos_jugador"][nombre]))
@@ -284,8 +283,8 @@ def datos_personajes(num_domain, entidades):
     if tipo in TIPOS_PLAYER:
       for template in PLAYER_INFO[num_domain]:
         datos.append(template.format(nombre))
-      if tipo != "picker":
-        datos.append("(= (total-points {}) 0)")
+      if tipo != "picker" and num_domain >= 4:
+        datos.append("(= (total-points {}) 0)".format(nombre))
 
   return datos
 
@@ -343,7 +342,7 @@ def genera_pddl(entrada):
     init.append("(= (sum-points) 0)")
 
   jugadores = [(name, tipo) for name, tipo in entidades.items() if tipo in TIPOS_PLAYER]
-  if num_domain == 7 and len(jugadores) != datos["numero de jugadores"]:
+  if num_domain == 7 and len(jugadores) != int(datos["numero de jugadores"]):
     raise ParseError(
       "-", "se esperaban {} jugadores, se obtuvieron {}".format(datos["numero de jugadores"],
                                                                 len(jugadores)))

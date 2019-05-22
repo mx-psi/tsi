@@ -1,16 +1,18 @@
-Dominio:Ejercicio5
+Dominio:Ejercicio7
 Problema:Problema1
 numero de zonas:25
 puntos_totales:50
-bolsillo:[leonardo1:2 leonardo2:1 bruja1:2 princesa1:6 principe1:1 profesor1:4]
+numero de jugadores:3
+bolsillo:[leonardo1:3 bruja1:2 princesa1:6 principe1:1 profesor1:4]
+puntos_jugador:[player1:20 player2:20]
 
-H -> z2[][Bosque]=2=z3[leonardo2-Leonardo][Arena]
+H -> z2[][Bosque]=2=z3[][Arena]
 H -> z6[][Agua]=6=z7[leonardo1-Leonardo bikini1-Bikini][Piedra]
 H -> z8[][Precipicio]=3=z9[][Arena]=10=z10[][Bosque]
 H -> z12[oscar2-Oscar manzana2-Manzana][Arena]=3=z13[princesa1-Princesa][Piedra]
-H -> z16[oscar3-Oscar][Arena]=6=z17[player1-Player zapatilla1-zapatilla oscar1-Oscar][Arena]
+H -> z16[oscar3-Oscar][Arena]=6=z17[player1-Dealer player3-Picker zapatilla1-zapatilla oscar1-Oscar][Arena]
 H -> z18[][Bosque]=9=z19[][Agua]
-H -> z22[][Bosque]=8=z23[bruja1-Bruja][Piedra]=1=z24[manzana1-Manzana][Arena]
+H -> z22[][Bosque]=8=z23[player2-Dealer bruja1-Bruja][Piedra]=1=z24[manzana1-Manzana][Arena]
 
 V -> z1[principe1-Principe][Piedra]=9=z6[]=10=z11[][Precipicio]
 V -> z16[][]=4=z21[profesor1-Profesor][Piedra]

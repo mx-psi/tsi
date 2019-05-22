@@ -1,8 +1,8 @@
 Dominio:Ejercicio3
 Problema:Problema1
 numero de zonas:25
-H -> z2[][Bosque]=2=z3[][Arena]
-H -> z6[][Agua]=6=z7[leonardo1-Leonardo bikini1-Bikini][Piedra]
+H -> z2[bikini2-Bikini][Bosque]=2=z3[][Arena]
+H -> z6[zapatilla2-Zapatilla][Agua]=6=z7[leonardo1-Leonardo bikini1-Bikini][Piedra]
 H -> z8[][Precipicio]=3=z9[][Arena]=10=z10[][Bosque]
 H -> z12[oro1-Oro rosa1-Rosa][Arena]=3=z13[princesa1-Princesa][Piedra]
 H -> z16[algoritmo1-Algoritmo][Arena]=6=z17[player1-Player zapatilla1-zapatilla oscar1-Oscar][Arena]

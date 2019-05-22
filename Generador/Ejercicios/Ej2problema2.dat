@@ -1,0 +1,14 @@
+Dominio:Ejercicio2
+Problema:Problema2
+numero de zonas:16
+
+H -> z5[]=2=z6[]
+H -> z7[]=1=z8[algoritmo1-Algoritmo]
+H -> z9[principe1-Principe]=2=z10[rosa1-Rosa]=1=z11[oro1-Oro]=2=z12[profesor1-Profesor]
+H -> z13[leonardo1-Leonardo]=1=z14[]
+H -> z15[]=2=z16[bruja1-Bruja]
+
+V -> z1[player1-Player]=1=z5[]
+V -> z2[manzana1-Manzana]=2=z6[]=1=z10[]=2=z14[]
+V -> z3[oscar1-Oscar]=1=z7[]=2=z11[]=1=z15[]
+V -> z4[princesa1-Princesa]=2=z8[]

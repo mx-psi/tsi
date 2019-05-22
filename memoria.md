@@ -7,7 +7,7 @@ documentclass: scrartcl
 toc: true
 lang: es
 colorlinks: true
-toc-depth: 1
+toc-depth: 2
 toc-title: Índice
 header-includes:
 - \newcommand{\x}{\mathbf{x}}
@@ -189,6 +189,23 @@ Además, tenemos las acciones para coger, dejar y entregar un objeto.
 
 ## d) Plantear problema con 25 zonas
 
+Planteamos dos problemas, uno con 25 zonas más sencillo y otro con 16 zonas que será más complejo.
+
+Describo la información en todos los apartados de este tipo en el formato del generador ya que es más sencillo de ver. Cada nivel se añade en formato pddl y en el formato del generador, cambiando la extensión a `.pddl` o `.dat` respectivamente.
+
+Los predicados de inicio son
+
+1. los que relacionan las orientaciones,
+2. los predicados de conexión,
+3. los que indican la localización de personajes y objetos y
+4. los que inicializan el estado del jugador.
+
+Como objetivo he puesto en ambos casos que cada personaje tenga el objeto de su tipo.
+
+En el primer caso están dispuestos a poca distancia cada personaje de su objeto y en el segundo tienen más distancia entre sí.
+
+Los resultados pueden verse en los ficheros de solución.
+
 ## e) Generador de problemas
 
 El generador de problemas está escrito en Python 3 y está disponible en la carpeta `Generador`.
@@ -241,14 +258,13 @@ Este efecto nos permite actualizar la distancia total en función del camino.
 
 ## b) Añadir distancias al problema
 
-En el problema, tenemos que añadir las distancias entre cada dos puntos y la distancia total del jugador, inicializada a 1.
+En el problema, tenemos que añadir las distancias entre cada dos puntos y la distancia total del jugador, inicializada a 0.
+Trabajamos sobre los mismos mapas y con el mismo objetivo.
 
 Además, añadimos la orden `:metric` para poder minimizar la distancia total del jugador si lo especificamos:
 ```lisp
 (:metric minimize (total-distance player1))
 ```
-
-TODO
 
 ## c) Añadir distancias al generador
 
@@ -334,6 +350,12 @@ Esta acción nos permite tanto meter algo en la mochila que tengamos en la mano 
 
 ## c) Extender el problema
 
+Añadimos el tipo a todas las zonas y añadimos 2 bikinis y 2 zapatillas. 
+Un bikini y una zapatilla se hallan en una zona de bosque y de agua respectivamente en el caso del primer problema.
+El primer problema también incluye precipicios.
+
+Para resolver ambos problemas es necesario atravesar zonas de bosque y agua, lo que el planificador hace correctamente.
+
 ## d) Extender el script
 
 El script se ha extendido para considerar los tipos de zonas.
@@ -367,7 +389,13 @@ E indicamos que como efecto incrementamos el número total de puntos del jugador
 
 ## b) Extender el problema
 
-Añadir `is-type`
+Añadimos los tipos de personajes y objetos y las recompensas de cada par de tipos objeto-personaje.
+
+En el primer mapa sólo incluimos 2 manzanas y 3 oscars, e incluimos todos los personajes.
+La única forma de obtener 50 puntos es entregar correctamente las manzanas y oscars a la bruja y a Leonardo respectivamente.
+El planificador lo resuelve de forma correcta.
+
+En el segundo mapa de nuevo el objetivo son 50 puntos pero esta vez la única forma correcta de conseguirlo es entregar su objeto a cada personaje.
 
 ## c) Extender el script
 
@@ -406,6 +434,17 @@ He considerado que esto añadía una complejidad innecesaria al problema.
 
 ## b) Extender el problema
 
+Para probar esta restricción, en el primer problema añado un nuevo Leonardo y restrinjo los bolsillos de tal forma que haya forzosamente que dar oscars a ambos Leonardos:
+```
+bolsillo:[leonardo1:2 leonardo2:1 bruja1:2 princesa1:6 principe1:1 profesor1:4]
+```
+El programa funciona correctamente.
+
+En el segundo problema, bajamos el número de puntos e indicamos que un personaje no puede recibir objetos:
+```
+puntos_totales:40
+bolsillo:[principe1:1 leonardo1:0 princesa1:1 profesor1:1 bruja1:1]
+```
 
 ## c) Extender el script
 
@@ -425,6 +464,23 @@ Esta function no es estrictamente necesaria ya que siempre podemos calcular esta
 Para incrementar esta cantidad simplemente añadidmos en la acción `give` el efecto `(increase (sum-points) (reward ?to ?tc))`.
 
 ## b) Extender el problema
+
+En el primer ejercicio añadimos un nuevo jugador e indicamos el número de puntos totales a 50 y restringimos el número de puntos para cada jugador a 20:
+```
+puntos_jugador:[player1:20 player2:20]
+```
+
+De esta forma ambos jugadores tienen que conseguir puntos.
+El planificador encuentra una solución correcta.
+
+En el segundo caso hacemos una restricción similar partiendo del segundo ejercicio del apartado anterior y añadiendo un nuevo jugador:
+```
+puntos_totales:40
+puntos_jugador:[player1:20 player2:10]
+bolsillo:[principe1:1 leonardo1:0 princesa1:1 profesor1:1 bruja1:1]
+```
+El planificador halla una solución correcta.
+
 
 ## c) Extender el script
 
@@ -469,6 +525,13 @@ Por último he añadido la acción `exchange`, que permite a un `Picker` entrega
 De esta forma no duplicamos acciones que hagan tanto `Dealer`s como `Picker`s, ya que ambos son personajes.
 
 ## b) Extender el problema
+
+En el primer problema, hacemos que los jugadores ya existentes sean `Dealer`s y añadimos un nuevo jugador que sea `Picker`.
+El problema se resuelve correctamente: el `Picker` (`player3`) coge los objetos del mundo y se los da a los `Dealer`.
+
+En el segundo problema uno de los jugadores es el `Dealer` y otro el `Picker`.
+También se llega a una solución correcta.
+
 
 ## c) Extender el script
 
