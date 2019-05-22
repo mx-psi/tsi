@@ -48,7 +48,7 @@
     (total-distance ?p - Player)
 
     ;; Puntos totales
-    (total-points ?p - Player)
+    (total-points ?p - Dealer)
 
     ;; Recompensa obtenida con un par objeto - personaje
     (reward ?objecttype - Tipo ?npctype - Tipo)

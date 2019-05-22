@@ -1,0 +1,8 @@
+graph{
+rankdir="BT";
+{Tipo Slot Orientacion Zona Localizable} -- object;
+{Personaje Objeto} -- Localizable;
+{Player NPC} -- Personaje;
+{Dealer Picker} -- Player;
+{Herramienta Entregable} -- Objeto;
+}

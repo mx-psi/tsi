@@ -382,15 +382,95 @@ En el script añadimos las siguientes funcionalidades:
 # Ejercicio 5
 
 ## a) Añadir bolsillos mágicos a personajes
+
+Para añadir esta propiedad al dominio añadimos dos functions
+
+1. `(max-objects ?npc - NPC)` que nos indica el número máximo de objetos que puede tener un personaje y
+2. `(cur-objects ?npc - NPC)`, que nos indica la cantidad actual de objetos que tiene el personaje.
+
+Tengo que especificar ambas condiciones a nivel de NPCs y no a nivel de tipos porque podrían diferir.
+A continuación la acción `give` sufre los siguientes cambios
+
+1. Se añade como precondición que no hayamos alcanzado el máximo de objetos para el NPC `?c`, esto es
+  ```lisp
+(< (cur-objects ?c) (max-objects ?c))
+  ```
+2. Se incrementa el número de objetos que tiene el personaje en 1,
+  ```lisp
+(increase (cur-objects ?c) 1)
+  ```
+  
+De esta forma registramos el número actual de objetos que tiene cada personaje en su bolsillo.
+Una posible generalización sería seguir el sistema de slots utilizado para los jugadores, en el caso de que un personaje tuviera más de un bolsillo.
+He considerado que esto añadía una complejidad innecesaria al problema.
+
 ## b) Extender el problema
+
+
 ## c) Extender el script
+
+En el script exigimos que la variable `bolsillo` esté definida, y añadimos el predicado `max-objects` para los personajes para los que esté definido.
+
+Dado que no estaba especificado en el enunciado, he asumido que si un personaje no tiene su capacidad máxima definida **se asume** que esta capacidad es **0** (esto es, no se añade el predicado).
 
 # Ejercicio 6
 
 ## a) Añadir múltiples jugadores
+
+El dominio tal y como estaba definido en el ejercicio anterior puede manejar sin problemas esta situación.
+
+Sin embargo, por simplicidad he añadido una function que lleve la cuenta del número total de puntos obtenido por todos los jugadores, `(sum-points)`.
+Esta function no es estrictamente necesaria ya que siempre podemos calcular esta cantidad como la suma de los puntos totales de cada jugador pero sí simplifica la escritura de objetivos que se refieran a esta suma de puntos, en especial cuando hay una cantidad arbitraria de jugadores.
+
+Para incrementar esta cantidad simplemente añadidmos en la acción `give` el efecto `(increase (sum-points) (reward ?to ?tc))`.
+
 ## b) Extender el problema
+
 ## c) Extender el script
+
+El script requiere ahora la variable `puntos_jugador` que debe tener la información de los puntos de todos los jugadores. 
+Gestionamos también que los puntos de cada jugador y la suma de puntos totales llegue a los umbrales especificados.
 
 # Ejercicio 7
 
 ## a) Añadir tipos de jugadores
+
+He extendido la jerarquía de tipos para añadir los tipos `Dealer` y `Picker`,
+![Jerarquía de tipos utilizada en el ejercicio 7](assets/tiposEj7.pdf){width=100%}
+(omito los tipos sin uso).
+
+He realizado los siguientes cambios en acciones, predicados y functions ya existentes:
+
+1. la function `total-points` se restringe a `Dealer`s,
+2. la acción `pick-up` se restringe a `Picker`s y
+3. la acción `give` se restringe a `Dealer`s.
+
+Por último he añadido la acción `exchange`, que permite a un `Picker` entregar un objeto a un `Dealer` que esté en su misma localización,
+```lisp
+(:action exchange
+  :parameters (?p1 - Picker ?p2 - Dealer ?o - Objeto ?z - Zona)
+  :precondition
+    (and
+      (is-at ?p1 ?z)
+      (is-at ?p2 ?z)
+      (holding-in ?p1 mano ?o)
+      (empty mano ?p2)
+      )
+  :effect
+    (and
+      (not (holding-in ?p1 mano ?o))
+      (not (empty mano ?p2))
+      (holding-in ?p2 mano ?o)
+      (empty mano ?p1)
+      )
+)
+```
+
+De esta forma no duplicamos acciones que hagan tanto `Dealer`s como `Picker`s, ya que ambos son personajes.
+
+## b) Extender el problema
+
+## c) Extender el script
+
+En el script exigimos la variable `numero de jugadores`, que comprobamos.
+Además, restringimos el añadido de `total-points` al objetivo y al inicio a jugadores de tipo `Dealer`.

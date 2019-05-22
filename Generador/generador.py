@@ -84,7 +84,7 @@ PLAYER_INFO = {
   4: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})", "(= (total-points {}) 0)"],
   5: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})", "(= (total-points {}) 0)"],
   6: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})", "(= (total-points {}) 0)"],
-  7: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})", "(= (total-points {}) 0)"]
+  7: ["(oriented {} S)", "(empty mano {})", "(empty mochila {})"]
 }
 
 ## Tipos de NPC, objetos y jugadores
@@ -99,6 +99,7 @@ DISTS_RE = re.compile("=(\d*?)=")
 
 class ParseError(Exception):
   """Excepción en el parsing."""
+
   def __init__(self, lineno, message):
     self.lineno = lineno
     self.message = message
@@ -167,7 +168,8 @@ def parsea(entrada, num_zonas, start, num_domain):
   # Comprueba número de zonas
   zonas_obtenidas = len(zonas.keys())
   if int(num_zonas) != zonas_obtenidas:
-    raise ParseError(lineno,"Se esperaban {} zonas, se obtuvieron {}.".format(num_zonas, zonas_obtenidas))
+    raise ParseError(lineno,
+                     "Se esperaban {} zonas, se obtuvieron {}.".format(num_zonas, zonas_obtenidas))
 
   return zonas, conexiones, entidades, distancias
 
@@ -211,7 +213,7 @@ def lee_datos(entrada):
         datos[clave.strip().lower()] = valor.strip().lower()
     # Si hemos salido
     else:
-      entrada.seek(pos) # retrodece hasta el principio de la linea actual
+      entrada.seek(pos)  # retrodece hasta el principio de la linea actual
       return datos, lineno
 
 
@@ -243,11 +245,8 @@ def get_metric(num_domain, ents):
   return metric
 
 
-def get_goal(num_domain, datos, entidades):
+def get_goal(num_domain, datos, jugadores):
   """Obten objetivo"""
-
-  nombres = [name for name, tipo in entidades.items() if tipo in TIPOS_PLAYER]
-  num_player = len(nombres)
 
   if num_domain <= 3:
     goal = input("Introduzca el objetivo: ").lower().strip()
@@ -255,18 +254,16 @@ def get_goal(num_domain, datos, entidades):
   elif num_domain <= 5:
     if num_player != 1:
       raise ParseError("-", "se esperaba 1 jugador, se obtuvieron {}".format(num_player))
-    return "   (= (total-points {}) {})\n".format(nombres[0], datos["puntos_totales"])
+    return "   (= (total-points {}) {})\n".format(jugadores[0][0], datos["puntos_totales"])
   else:
-    if num_player != 2:
-      raise ParseError("-", "se esperaban 2 jugadores, se obtuvieron {}".format(num_player))
-
-    objetivos = [
-      "(= (+ (total-points {}) (total-points {})) {})".format(nombres[0], nombres[1],
-                                                              datos["puntos_totales"])
-    ]
-
-    for nombre in nombres:
-      objetivos.append("(>= (total-points {}) {})".format(nombre, datos["puntos_jugador"][nombre]))
+    objetivos = ["(= (sum-points) {})".format(datos["puntos_totales"])]
+    try:
+      for nombre, tipo in nombres:
+        if tipo != "picker":
+          objetivos.append("(>= (total-points {}) {})".format(nombre,
+                                                              datos["puntos_jugador"][nombre]))
+    except KeyError as k:
+      raise ParseError("-", "no se especifican los puntos del jugador '{}'.".format(k.args[0]))
 
     return "   (and " + " ".join(objetivos) + ")\n"
 
@@ -287,6 +284,8 @@ def datos_personajes(num_domain, entidades):
     if tipo in TIPOS_PLAYER:
       for template in PLAYER_INFO[num_domain]:
         datos.append(template.format(nombre))
+      if tipo != "picker":
+        datos.append("(= (total-points {}) 0)")
 
   return datos
 
@@ -300,7 +299,8 @@ def genera_pddl(entrada):
     if num_domain >= n:
       for campo in requeridos:
         if campo not in datos:
-          raise ParseError(lineno, "'{}' es requerido para dominio {}".format(campo, datos["dominio"]))
+          raise ParseError(lineno,
+                           "'{}' es requerido para dominio {}".format(campo, datos["dominio"]))
 
   zonas, conexiones, entidades, distancias = parsea(entrada, datos["numero de zonas"], lineno,
                                                     num_domain)
@@ -339,11 +339,20 @@ def genera_pddl(entrada):
     for nombre, num in datos["bolsillo"].items():
       init.append("(= (max-objects {}) {})".format(nombre, num))
 
+  if num_domain >= 6:
+    init.append("(= (sum-points) 0)")
+
+  jugadores = [(name, tipo) for name, tipo in entidades.items() if tipo in TIPOS_PLAYER]
+  if num_domain == 7 and len(jugadores) != datos["numero de jugadores"]:
+    raise ParseError(
+      "-", "se esperaban {} jugadores, se obtuvieron {}".format(datos["numero de jugadores"],
+                                                                len(jugadores)))
+
   return TEMPLATE.format(nombre=datos["problema"],
                          dominio=datos["dominio"],
                          objects=junta_lits(objects),
                          init=junta_lits(init),
-                         goal=get_goal(num_domain, datos, entidades),
+                         goal=get_goal(num_domain, datos, jugadores),
                          metric=get_metric(num_domain, entidades))
 
 
@@ -363,6 +372,6 @@ if __name__ == "__main__":
     if p.lineno != '-':
       print("Error en linea {}: {}".format(p.lineno, p.message))
     else:
-      print("Error: {}".format(p.lineno, p.message))
+      print("Error: {}".format(p.message))
   except FileNotFoundError as f:
     print("Error: No se pudo abrir '{}'.".format(args.entrada))
