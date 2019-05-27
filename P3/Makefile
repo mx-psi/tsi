@@ -6,7 +6,7 @@ PROBLEMAS:=$(patsubst %.pddl, %.out.txt, $(GENERABLES))
 # Ejecutable de HTNP
 HTNP:=./htnp/htnp.exe
 
-all: entrega.zip $(PROBLEMAS)
+all: $(PROBLEMAS) entrega.zip
 
 E1/%.out.txt: E1/%.pddl E1/dominio.pddl
 	wine $(HTNP) -d E1/dominio.pddl -p $< 2>&1 | sed -e "s/\r/\n/g" > $@
