@@ -63,13 +63,17 @@ Para volar el avión comprobamos que tenga combustible suficiente y transportamo
 (:task volar-avion
  :parameters (?a - aircraft ?c1 - city ?c2 -city)
   (:method rapido
-    :precondition (<= (+ (total-fuel-used) (* (distance ?c1 ?c2) (fast-burn ?a))) (fuel-limit))
+    :precondition 
+    (<= (+ (total-fuel-used) 
+        (* (distance ?c1 ?c2) (fast-burn ?a))) (fuel-limit))
     :tasks (
           (zoom ?a ?c1 ?c2)
          )
    )
   (:method lento
-    :precondition (<= (+ (total-fuel-used) (* (distance ?c1 ?c2) (slow-burn ?a))) (fuel-limit))
+    :precondition 
+    (<= (+ (total-fuel-used) 
+        (* (distance ?c1 ?c2) (slow-burn ?a))) (fuel-limit))
     :tasks (
              (fly ?a ?c1 ?c2)
              )
@@ -91,6 +95,25 @@ Por último `mover-avion` hace estas tareas en orden:
 ```
 
 # Ejercicio 4
-
 ## Decisiones de diseño
+
+### 1. Número máximo de pasajeros
+
+Añadimos dos functions nuevas que tengan en cuenta el número actual y máximo de pasajeros en un avión concreto:
+```lisp
+(number-passengers ?a - aircraft)
+(max-passengers ?a - aircraft)
+```
+Estas functions se inicializarán en el dominio del problema: la primera a cero y la segunda a la capacidad máxima de la aeronave.
+
+A continuación en las primitivas hacemos los siguientes cambios:
+
+1. `board` comprueba que haya sitio, esto es, `(< (number-passengers ?a) (max-passengers ?a))`.
+   Como efecto, incrementa el número de pasajeros, `(increase (number-passengers ?a) 1)`.
+2. `debark` decrementa el número de pasajeros, `(decrease (number-passengers ?a) 1)`.
+
+### 2. Embarcar varios pasajeros
+
+### 3. Duración limitad para los viajes de un avión
+
 ## Experimentación
