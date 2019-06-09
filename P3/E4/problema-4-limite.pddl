@@ -6,14 +6,23 @@
 (= :time-unit :hours))
 
 (:objects
-    p1 p2 p3 - person
+    p1 p2 p3 p4 - person
     c1 c2 c3 c4 c5 - city
     a1 - aircraft
 )
-(:init
+  (:init
+
+    ;; Casos límite:
+    ;; - p1 tiene como destino su origen
+    ;; - p4 está en c4 y puede ser recogido
+    ;;   cuando vaya a por otro pasajero
+    ;; - p2 y p3 parten de la misma ciudad
+
     (at p1 c1)
     (at p2 c2)
-    (at p3 c3)
+    (at p3 c2)
+    (at p4 c4)
+
     (at a1 c4)
     (= (fuel-limit) 1500)
     (= (distance c1 c2) 100)
@@ -43,22 +52,24 @@
     (= (total-fuel-used) 0)
     (= (boarding-time) 1)
     (= (debarking-time) 1)
-    (= (max-passengers a1) 1)
+    (= (max-passengers a1) 2)
     (= (number-passengers a1) 0)
     (= (max-time a1) 1000)
     (= (time-flown a1) 0)
 
-    (destino p1 c5)
+    (destino p1 c1)
     (destino p2 c5)
     (destino p3 c5)
+    (destino p4 c2)
  )
 
 
 (:tasks-goal
    :tasks(
-   (transport-person p1 c5)
+   (transport-person p1 c1)
    (transport-person p2 c5)
    (transport-person p3 c5)
+   (transport-person p4 c2)
 
    )
   )
