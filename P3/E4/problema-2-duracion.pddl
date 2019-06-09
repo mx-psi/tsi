@@ -247,11 +247,11 @@
 
     ;; Destinos de los pasajeros
 
-    (destino p1 sevilla)
+    (destino p1 gibraltar)
     (destino p2 malaga)
     (destino p3 madrid)
-    (destino p4 jaen)
-    (destino p5 huelva)
+    (destino p4 huelva)
+    (destino p5 jaen)
     (destino p6 granada)
     (destino p7 cordoba)
     (destino p8 gibraltar)
@@ -261,11 +261,11 @@
   (:tasks-goal
     :tasks
     (
-      (transport-person p1 sevilla)
+      (transport-person p1 gibraltar)
       (transport-person p2 malaga)
       (transport-person p3 madrid)
-      (transport-person p4 jaen)
-      (transport-person p5 huelva)
+      (transport-person p4 huelva)
+      (transport-person p5 jaen)
       (transport-person p6 granada)
       (transport-person p7 cordoba)
       (transport-person p8 gibraltar)
