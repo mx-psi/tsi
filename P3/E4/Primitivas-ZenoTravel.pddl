@@ -28,7 +28,10 @@
               (increase (total-fuel-used)
                          (* (distance ?c1 ?c2) (slow-burn ?a)))
               (decrease (fuel ?a)
-                         (* (distance ?c1 ?c2) (slow-burn ?a)))))
+                (* (distance ?c1 ?c2) (slow-burn ?a)))
+           (increase (time-flown ?a)
+             (/ (distance ?c1 ?c2) (slow-speed ?a)))
+           ))
 
 (:durative-action zoom
  :parameters (?a - aircraft ?c1 ?c2 - city)
@@ -41,7 +44,10 @@
                (increase (total-fuel-used)
                          (* (distance ?c1 ?c2) (fast-burn ?a)))
               (decrease (fuel ?a)
-                         (* (distance ?c1 ?c2) (fast-burn ?a)))))
+                (* (distance ?c1 ?c2) (fast-burn ?a)))
+           (increase (time-flown ?a)
+             (/ (distance ?c1 ?c2) (fast-speed ?a)))
+           ))
 
 (:durative-action refuel
  :parameters (?a - aircraft ?c - city)

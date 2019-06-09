@@ -14,6 +14,8 @@
   ; Requisitos adicionales para el manejo del tiempo
   :durative-actions
   :metatags
+
+  :equality
  )
 
 (:types aircraft person city - object)
@@ -44,7 +46,9 @@
 
     (number-passengers ?a - aircraft)
     (max-passengers ?a - aircraft)
+
     (max-time ?a - aircraft)
+    (time-flown ?a - aircraft)
 
     (total-fuel-used)
     (fuel-limit)
@@ -54,10 +58,10 @@
 
 ;; el consecuente "vac�o" se representa como "()" y significa "siempre verdad"
 (:derived
-  (igual ?x ?y) ())
+  (igual ?x - city ?y - city) (= ?x ?y))
 
 (:derived
-  (different ?x ?y) (not (igual ?x ?y)))
+  (different ?x - city ?y - city) (not (= ?x ?y)))
 
 ;; Indica si hay sitio en un avión para más pasajeros
   (:derived
@@ -85,7 +89,11 @@
 
   (:derived
     (hay-time-fly ?a - aircraft ?c1 - city ?c2 - city)
-    (<= (/ (distance ?c1 ?c2) (slow-speed ?a)) (max-time ?a)))
+    (<= (+ (time-flown ?a) (/ (distance ?c1 ?c2) (slow-speed ?a))) (max-time ?a)))
+
+  (:derived
+    (hay-time-zoom ?a - aircraft ?c1 - city ?c2 - city)
+    (<= (+ (time-flown ?a) (/ (distance ?c1 ?c2) (fast-speed ?a))) (max-time ?a)))
 
  ;; Tarea para transportar una persona
 (:task transport-person
@@ -99,7 +107,8 @@
 
    (:method Case2 ;si no est� en la ciudad destino, pero avion y persona est�n en la misma ciudad
 	  :precondition (and (at ?p - person ?c1 - city)
-			                 (at ?a - aircraft ?c1 - city))
+			              (at ?a - aircraft ?c1 - city)
+                    (different ?c1 ?c))
 
 	  :tasks (
 	  	       (board-all ?a ?c1 ?c)
