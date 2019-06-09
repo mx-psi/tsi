@@ -25,14 +25,15 @@
     (in ?p - person ?a - aircraft)
     (different ?x ?y)
     (igual ?x ?y)
+    (destino ?p - person ?c - city)
+
+    ;; Predicados derivados
     (puede-zoom ?a -aircraft ?c1 - city ?c2 - city)
     (puede-fly ?a -aircraft ?c1 - city ?c2 - city)
     (hay-fuel-fly ?a - aircraft ?c1 - city ?c2 - city)
     (hay-fuel-zoom ?a - aircraft ?c1 - city ?c2 - city)
     (hay-time-fly ?a - aircraft ?c1 - city ?c2 - city)
     (hay-time-zoom ?a - aircraft ?c1 - city ?c2 - city)
-    (hay-sitio ?a - aircraft)
-    (destino ?p - person ?c - city)
              )
   (:functions
     (fuel ?a - aircraft)
@@ -44,10 +45,16 @@
     (capacity ?a - aircraft)
     (refuel-rate ?a - aircraft)
 
+    ;; Número de pasajeros actual
     (number-passengers ?a - aircraft)
+
+    ;; Número de pasajeros máximo
     (max-passengers ?a - aircraft)
 
+    ;; Máximo tiempo que puede volar este avión
     (max-time ?a - aircraft)
+
+    ;; Tiempo volado por este avión
     (time-flown ?a - aircraft)
 
     (total-fuel-used)
@@ -56,16 +63,13 @@
     (debarking-time)
             )
 
-;; el consecuente "vac�o" se representa como "()" y significa "siempre verdad"
-(:derived
-  (igual ?x - city ?y - city) (= ?x ?y))
-
-(:derived
-  (different ?x - city ?y - city) (not (= ?x ?y)))
-
-;; Indica si hay sitio en un avión para más pasajeros
+  ;; No funcionaba. Arreglado con :equality y explicitación de tipos
   (:derived
-    (hay-sitio ?a) (< (number-passengers ?a) (max-passengers ?a)))
+    (igual ?x - city ?y - city) (= ?x ?y))
+
+  ;; No funcionaba. Arreglado con :equality y explicitación de tipos
+  (:derived
+    (different ?x - city ?y - city) (not (= ?x ?y)))
 
   ;; Hay fuel en el depósito para volar rápido
   (:derived
@@ -87,59 +91,67 @@
     (puede-fly ?a - aircraft ?c1 - city ?c2 - city)
     (<= (+ (total-fuel-used) (* (distance ?c1 ?c2) (slow-burn ?a))) (fuel-limit)))
 
+  ;; Hay tiempo para volar lento
   (:derived
     (hay-time-fly ?a - aircraft ?c1 - city ?c2 - city)
     (<= (+ (time-flown ?a) (/ (distance ?c1 ?c2) (slow-speed ?a))) (max-time ?a)))
 
+  ;; Hay tiempo para volar rápido
   (:derived
     (hay-time-zoom ?a - aircraft ?c1 - city ?c2 - city)
     (<= (+ (time-flown ?a) (/ (distance ?c1 ?c2) (fast-speed ?a))) (max-time ?a)))
 
- ;; Tarea para transportar una persona
-(:task transport-person
-	:parameters (?p - person ?c - city)
+  ;;;;;;;;;;;;
+  ;; TAREAS ;;
+  ;;;;;;;;;;;;
 
-  (:method Case1 ; si la persona est� en la ciudad no se hace nada
+  ;; Tarea para transportar una persona
+  (:task transport-person
+	  :parameters (?p - person ?c - city)
+
+  (:method Case1 ; si la persona está en la ciudad no se hace nada
 	 :precondition (at ?p ?c)
 	 :tasks ()
-   )
+    )
 
-
-   (:method Case2 ;si no est� en la ciudad destino, pero avion y persona est�n en la misma ciudad
+   (:method Case2 ;si no está en la ciudad destino, pero avion y persona est�n en la misma ciudad
 	  :precondition (and (at ?p - person ?c1 - city)
 			              (at ?a - aircraft ?c1 - city)
                     (different ?c1 ?c))
 
-	  :tasks (
-	  	       (board-all ?a ?c1 ?c)
-		         (mover-avion ?a ?c1 ?c)
-		         (debark-all ?a ?c )))
+	   :tasks (
+             (board ?p ?a ?c1) ;; Asegúrate de meter a la persona objetivo
+	  	       (board-all ?a ?c1 ?c 0) ;; Embarca al resto que sea posible
+		         (mover-avion ?a ?c1 ?c) ;; Mueve
+		         (debark-all ?a ?c))) ;; Desembarca
+
 
   (:method Case3 ; si no está en la ciudad destino y hay un avión en otra ciudad.
     :precondition (and (at ?p - person ?c1 - city)
                     (at ?a - aircraft ?c2 - city)
-                    (different ?c1 ?c2))
+                    (different ?c1 ?c2)
+                    (different ?c1 ?c))
     :tasks (
-             (mover-avion ?a ?c2 ?c1)
-             (transport-person ?p ?c)
+             (acercar-avion ?a ?c2 ?c1 ?c) ;; Acerca el avión
+             (transport-person ?p ?c) ;; Llama recursivamente
              )
     )
 	)
 
-  ;; Embarca a todos los pasajeros que vayan a un destino
+  ;; Embarca a todos los pasajeros que vayan a un destino dejando al menos ?seats sitios libres
   (:task board-all
-    :parameters (?a - aircraft ?orig - city ?dest - city)
+    :parameters (?a - aircraft ?orig - city ?dest - city ?seats - number)
     (:method Recursivo
       :precondition (and
                       (at ?p ?orig)
                       (destino ?p ?dest)
-                      (hay-sitio ?a))
+                      (< (+ ?seats (number-passengers ?a)) (max-passengers ?a)))
     :tasks (
              (board ?p ?a ?orig)
-             (board-all ?a ?orig ?dest)
+             (board-all ?a ?orig ?dest ?seats) ;; Embarca recursivamente
              )
       )
-    (:method Base
+    (:method Base ;; Caso base
       :precondition ()
       :tasks ())
     )
@@ -147,20 +159,55 @@
   ;; Desembarca a todos los pasajeros que lleguen a un destino
   (:task debark-all
     :parameters (?a - aircraft ?c - city)
+
+    ;; Si queda alguien a desembarcar que sea su destino, desembarca
     (:method Recursivo
-      :precondition (and
-                      (in ?p ?a)
+      :precondition (and (in ?p ?a)
                       (destino ?p ?c))
       :tasks (
                (debark ?p ?a ?c)
-               ))
+               (debark-all ?a ?c)
+               )
+      )
+
+    ;; Caso base
     (:method Base
       :precondition ()
-      :tasks ())
+      :tasks ()
+      )
     )
 
 
+  ;; Acerca el avión desde otra ciudad
+  ;; Mete a todas las personas que haya dejando un sitio libre
+  ;; para la persona a la que le acercamos el avión
+  (:task acercar-avion
+    :parameters (?a - aircraft ?orig - city ?int - city ?dest - city)
+    ;; Si el avión no está en el destino
+    (:method TrasbordoDoble
+      :precondition (different ?orig ?dest)
+      :tasks (
+               (board-all ?a ?orig ?dest 1) ;; Asegúrate de dejar un sitio libre
+               (board-all ?a ?orig ?int 1)
+               (mover-avion ?a ?orig ?int)
+               (debark-all ?a ?int)
+               )
+      )
 
+    ;; Si el avión está en el destino
+    (:method TrasbordoSimple
+      :precondition (igual ?orig ?dest)
+      :tasks (
+               ;; No embarcamos a aquellos con destino dest porque ya están allí
+               (board-all ?a ?orig ?int 1)
+               (mover-avion ?a ?orig ?int)
+               (debark-all ?a ?int)
+               )
+      )
+    )
+
+
+  ;; Mover avión de una localización a otra
   (:task mover-avion
     :parameters (?a - aircraft ?c1 - city ?c2 - city)
 

@@ -4,6 +4,7 @@
   (:requirements
     :typing
     :fluents
+    :equality
     :derived-predicates
     :negative-preconditions
     :universal-preconditions
@@ -45,10 +46,10 @@
 
   ;; el consecuente "vac�o" se representa como "()" y significa "siempre verdad"
   (:derived
-    (igual ?x ?x) ())
+    (igual ?x - city ?y - city) (= ?x ?y))
 
   (:derived
-    (different ?x ?y) (not (igual ?x ?y)))
+    (different ?x - city  ?y - city) (not (= ?x ?y)))
 
   ;; Hay fuel en el depósito para volar rápido
   (:derived
