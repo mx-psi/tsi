@@ -45,6 +45,7 @@
     (= (debarking-time) 1)
     (= (max-passengers a1) 1)
     (= (number-passengers a1) 0)
+    (= (max-time a1) 100)
 
     (destino p1 c5)
     (destino p2 c5)

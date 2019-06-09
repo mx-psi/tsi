@@ -27,6 +27,8 @@
     (puede-fly ?a -aircraft ?c1 - city ?c2 - city)
     (hay-fuel-fly ?a - aircraft ?c1 - city ?c2 - city)
     (hay-fuel-zoom ?a - aircraft ?c1 - city ?c2 - city)
+    (hay-time-fly ?a - aircraft ?c1 - city ?c2 - city)
+    (hay-time-zoom ?a - aircraft ?c1 - city ?c2 - city)
     (hay-sitio ?a - aircraft)
     (destino ?p - person ?c - city)
              )
@@ -80,6 +82,10 @@
   (:derived
     (puede-fly ?a - aircraft ?c1 - city ?c2 - city)
     (<= (+ (total-fuel-used) (* (distance ?c1 ?c2) (slow-burn ?a))) (fuel-limit)))
+
+  (:derived
+    (hay-time-fly ?a - aircraft ?c1 - city ?c2 - city)
+    (<= (/ (distance ?c1 ?c2) (slow-speed ?a)) (max-time ?a)))
 
  ;; Tarea para transportar una persona
 (:task transport-person
@@ -153,7 +159,8 @@
     (:method hayfuel-rapido
       :precondition (and
                       (hay-fuel-zoom ?a ?c1 ?c2)
-                      (puede-zoom ?a ?c1 ?c2))
+                      (puede-zoom ?a ?c1 ?c2)
+                      (hay-time-zoom ?a ?c1 ?c2))
       :tasks (
                (zoom ?a ?c1 ?c2)
                )
@@ -161,7 +168,9 @@
 
     ;; Puede recargar para volar rápido
     (:method no-hay-fuel-rapido
-      :precondition (puede-zoom ?a ?c1 ?c2)
+      :precondition (and
+                      (puede-zoom ?a ?c1 ?c2)
+                      (hay-time-zoom ?a ?c1 ?c2))
       :tasks (
                (refuel ?a ?c1)
                (mover-avion ?a ?c1 ?c2)
@@ -172,7 +181,8 @@
     (:method hay-fuel-lento
       :precondition (and
                       (hay-fuel-fly ?a ?c1 ?c2)
-                      (puede-fly ?a ?c1 ?c2))
+                      (puede-fly ?a ?c1 ?c2)
+                      (hay-time-fly ?a ?c1 ?c2))
       :tasks (
               (fly ?a ?c1 ?c2)
                )
@@ -180,7 +190,9 @@
 
     ;; Puede recargar para volar lento
     (:method no-hay-fuel-lento
-      :precondition (puede-fly ?a ?c1 ?c2)
+      :precondition (and
+                      (puede-fly ?a ?c1 ?c2)
+                      (hay-time-fly ?a ?c1 ?c2))
       :tasks (
                (refuel ?a ?c1)
                (mover-avion ?a ?c1 ?c2)
