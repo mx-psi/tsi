@@ -20,16 +20,11 @@ E3/%.out.txt: E3/%.pddl E3/dominio.pddl
 E4/%.out.txt: E4/%.pddl E4/dominio2.pddl
 	wine $(HTNP) -d E4/dominio2.pddl -p $< 2>&1 | sed -e "s/\r/\n/g" > $@
 
-# Comprueba si hay errores
-check:
-	echo "Lista de problemas con errores"
-	grep -L "0 errors" E*/*.out.txt
-
 clean:
 	rm -f E*/*.out.txt
 
 memoria.pdf: memoria.md
 	pandoc $< -o $@
 
-entrega.zip: memoria.pdf check
-	zip -9 $@ -r memoria.pdf E*/*.pddl
+entrega.zip: memoria.pdf
+	zip -9 $@ -r memoria.pdf E*/*.pddl E*/*.out.txt
